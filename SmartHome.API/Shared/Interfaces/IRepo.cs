@@ -1,0 +1,13 @@
+﻿namespace SmartHome.Shared.Interfaces
+{
+    public interface IRepo<T>
+    {
+        Task<IEnumerable<T>> GetAllAsync();
+
+        Task AddAsync(T entry);
+
+        Task AddRangeAsync(IEnumerable<T> entries);
+
+        Task<IEnumerable<T>> FilterAsync(Predicate<T> predicate);
+    }
+}
