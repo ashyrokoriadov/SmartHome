@@ -14,8 +14,8 @@
 // WIFI CONFIG
 // =====================================================
 
-char ssid[] = "CISZA NOCNA 2200 - 0700";
-char pass[] = "CP3FY3UT";
+char ssid[] = "SECRET_WI_FI";
+char pass[] = "SECRET_PASSWORD";
 
 // =====================================================
 // API CONFIG
