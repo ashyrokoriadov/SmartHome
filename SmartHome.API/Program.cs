@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartHome.API.Shared;
+using SmartHome.API.Options;
 using SmartHome.API.Shared.Interfaces;
 using SmartHome.API.Shared.Repos;
 using SmartHome.Shared.Repos.Interfaces;
@@ -16,7 +17,13 @@ namespace SmartHome.API
             // Add services to the container.
 
             builder.Services.AddControllers();
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=D:\\Temp\\SmartHome.db"));
+
+            // Bind ConnectionStrings options from configuration
+            builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.Section));
+
+            // Use configured connection string for DbContext
+            var sqliteConn = builder.Configuration.GetConnectionString("SqlLightConnection");
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(sqliteConn));
             builder.Services.AddScoped<IBatteryStateRepo, BatteryStateRepo>();
             builder.Services.AddScoped<ILightSensorDataRepo, LightSensorDataRepo>();
             builder.Services.AddScoped<ITemperatureDataRepo, TemperatureDataRepo>();
