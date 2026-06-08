@@ -14,8 +14,8 @@
 // WIFI CONFIG
 // =====================================================
 
-char ssid[] = "SECRET_WI_FI";
-char pass[] = "SECRET_PASSWORD";
+char ssid[] = "SECRET";
+char pass[] = "SECRET";
 
 // =====================================================
 // API CONFIG
@@ -29,7 +29,7 @@ const int serverPort = 5000;
 // =====================================================
 
 unsigned long lastSend = 0;
-const unsigned long interval = 15 * 1000;
+unsigned long interval = 15 * 1000;
 bool rtcInitialized = false;
 
 RTC_DS3231 rtc;
@@ -77,10 +77,6 @@ void setup() {
 
   while (!Serial && millis() - start < 3000);
 
-  Serial.println("=================================");
-  Serial.println("Arduino HTTP JSON Sender");
-  Serial.println("=================================");
-
   randomSeed(analogRead(A5));
 
   pinMode(D2, INPUT);
@@ -98,9 +94,7 @@ void setup() {
   sensors.begin();
   Serial.println("Temperature sensor DS18B20 found.");
 
-  if (ina219.begin()) {
-    Serial.println("Voltage sensor INA219 found.");
-  } else {    
+  if (!ina219.begin()) {    
     Serial.println("WARNING! Voltage sensor INA219 was not found.");
   }
 }
@@ -115,8 +109,6 @@ void loop() {
 
     Serial.println("WiFi disconnected!");
 
-    matrixPrint("WIFI RECONNECT");
-
     connectWiFi();
   }
 
@@ -127,6 +119,18 @@ void loop() {
     // ==========================================
     // FETCH METADATA
     // ==========================================
+
+    bool isHealthy = healthCheck();
+    if (!isHealthy)
+    {
+      matrixPrintStatic("E0");
+      interval = 15 * 60 * 1000;
+      return;
+    }
+    else
+    {
+      interval = 15 * 1000;
+    }
 
     bool correlationOk = httpGet(
       "/MetaData/CorrelationId",
@@ -151,7 +155,7 @@ void loop() {
 
       Serial.println("Metadata fetch failed");
 
-      matrixPrint("METADATA ERROR");
+      matrixPrintStatic("E1");
 
       return;
     }
@@ -164,7 +168,7 @@ void loop() {
     readLuminosity();
     readTemperature();
 
-    matrixPrint("OK. OK. OK.");
+    matrixPrintStatic("OK");
   }
 }
 
@@ -181,13 +185,8 @@ void connectWiFi() {
   while (status != WL_CONNECTED) {
 
     status = WiFi.begin(ssid, pass);
-
-    Serial.print(".");
-
     delay(5000);
   }
-
-  Serial.println("\nWiFi connected");
 
   IPAddress ip;
 
@@ -209,8 +208,6 @@ void connectWiFi() {
 
   Serial.print("Device IP: ");
   Serial.println(ip);
-
-  Serial.println("=================================");
 }
 
 // =====================================================
@@ -248,6 +245,42 @@ bool extractQuotedValue(
   output[len] = '\0';
 
   return true;
+}
+
+// =====================================================
+// HEALTH CHECK
+// =====================================================
+
+bool healthCheck()
+{
+    WiFiClient localClient;
+
+    if (!localClient.connect(serverHost, serverPort))
+    {
+        Serial.println("Connection failed");
+        return false;
+    }
+
+    localClient.print("GET ");
+    localClient.print("/HealthCheck");
+    localClient.print(" HTTP/1.1\r\n");
+
+    localClient.print("Host: ");
+    localClient.print(serverHost);
+    localClient.print(":");
+    localClient.print(serverPort);
+    localClient.print("\r\n");
+
+    localClient.print("Connection: close\r\n\r\n");
+
+    String statusLine = localClient.readStringUntil('\n');
+
+    Serial.print("Status: ");
+    Serial.println(statusLine);
+
+    localClient.stop();
+
+    return statusLine.indexOf("200") >= 0;
 }
 
 // =====================================================
@@ -350,10 +383,6 @@ bool httpGet(
 
     return false;
   }
-
-  Serial.print("Parsed value: ");
-  Serial.println(output);
-
   return true;
 }
 
@@ -505,15 +534,10 @@ bool sendData(
   if (!connected) {
 
     Serial.println("CONNECTION FAILED");
-
-    Serial.println("=================================");
-
     matrixPrint("CONNECTION FAILED");
 
     return false;
   }
-
-  Serial.println("Connected to server");
 
   // =====================================================
   // HTTP REQUEST
@@ -575,35 +599,37 @@ bool sendData(
   }
 
   localClient.stop();
-
-  Serial.println();
-  Serial.println("Disconnected from server");
-  Serial.println("=================================");
-
   return true;
 }
 
 // =====================================================
-// PRINT IN MATRIX
+// PRINT IN MATRIX WITH SCROLL
 // =====================================================
 
 void matrixPrint(const char* message) {
-
   matrix.clear();
-
   matrix.beginDraw();
-
   matrix.stroke(0xFFFFFF);
-
   matrix.textScrollSpeed(160);
-
   matrix.textFont(Font_5x7);
-
   matrix.beginText(0, 1, 0xFFFFFF);
-
   matrix.print(message);
-
   matrix.endText(SCROLL_LEFT);
-
   matrix.endDraw();
+}
+
+// =====================================================
+// PRINT IN MATRIX WITH SCROLL
+// =====================================================
+
+void matrixPrintStatic(const char* message)
+{
+    matrix.clear();
+    matrix.beginDraw();
+    matrix.stroke(0xFFFFFF);
+    matrix.textFont(Font_5x7);
+    int textWidth = strlen(message) * 6; // 5 px + 1 px spacing
+    int x = (12 - textWidth) / 2;
+    matrix.text(message, x, 1);
+    matrix.endDraw();
 }
