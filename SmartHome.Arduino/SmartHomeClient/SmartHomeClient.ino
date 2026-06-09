@@ -11,6 +11,24 @@
 #include <Adafruit_INA219.h>
 
 // =====================================================
+// CONTROL PINS
+// =====================================================
+
+int lightSensorControlPin = 2;
+int lampsControlPin = 7;
+
+// =====================================================
+// SENSOR DATA
+// =====================================================
+
+float temperature = -127;
+int lightSensorAnalogue = 0;
+int lightSensorDigital = 0;
+float voltage = 0;
+float current = 0;
+DateTime currentTime;
+
+// =====================================================
 // WIFI CONFIG
 // =====================================================
 
@@ -71,6 +89,10 @@ void setup() {
 
   Serial.begin(115200);
 
+  pinMode(lightSensorControlPin, INPUT);
+  pinMode(lampsControlPin, OUTPUT);
+  digitalWrite(lightSensorControlPin, LOW);
+
   matrix.begin();
 
   unsigned long start = millis();
@@ -78,8 +100,6 @@ void setup() {
   while (!Serial && millis() - start < 3000);
 
   randomSeed(analogRead(A5));
-
-  pinMode(D2, INPUT);
 
   connectWiFi();
 
@@ -106,15 +126,15 @@ void setup() {
 void loop() {
 
   if (WiFi.status() != WL_CONNECTED) {
-
     Serial.println("WiFi disconnected!");
-
     connectWiFi();
   }
 
   if (millis() - lastSend >= interval) {
 
     lastSend = millis();
+
+    toggleLightIfPossible();
 
     // ==========================================
     // FETCH METADATA
@@ -165,7 +185,7 @@ void loop() {
     // ==========================================
 
     readVoltage();
-    readLuminosity();
+    readLuminosity(true);
     readTemperature();
 
     matrixPrintStatic("OK");
@@ -178,7 +198,7 @@ void loop() {
 
 void connectWiFi() {
 
-  Serial.print("Connecting to WiFi");
+  Serial.println("Connecting to WiFi");
 
   int status = WL_IDLE_STATUS;
 
@@ -213,6 +233,33 @@ void connectWiFi() {
 // =====================================================
 // EXTRACT QUOTED VALUE
 // =====================================================
+
+void toggleLightIfPossible(){
+  readTime();
+  readLuminosity(false);
+
+  int hour = currentTime.hour();
+
+  bool timeCondition = (hour >= 19 && hour <= 23);
+  bool lightCondition = (lightSensorDigital == 1);
+
+  if (timeCondition || lightCondition) {
+    digitalWrite(lampsControlPin, HIGH);
+    Serial.println("Lamps are turned on. ");
+    Serial.print("timeCondition = ");
+    Serial.println(timeCondition);
+    Serial.print("lightCondition = ");
+    Serial.println(lightCondition);
+  } else {
+    digitalWrite(lampsControlPin, LOW);
+    Serial.println("Lamps are turned off.");
+    Serial.print("timeCondition = ");
+    Serial.println(timeCondition);
+    Serial.print("lightCondition = ");
+    Serial.println(lightCondition);
+  }
+
+}
 
 bool extractQuotedValue(
   const char* body,
@@ -387,30 +434,30 @@ bool httpGet(
 }
 
 void readTime(){
-  DateTime now = rtc.now();
+  currentTime = rtc.now();
 
-  Serial.print(now.day());
+  Serial.print(currentTime.day());
   Serial.print(".");
-  Serial.print(now.month());
+  Serial.print(currentTime.month());
   Serial.print(".");
-  Serial.print(now.year());
+  Serial.print(currentTime.year());
 
   Serial.print(" ");
 
-  Serial.print(now.hour());
+  Serial.print(currentTime.hour());
   Serial.print(":");
-  Serial.print(now.minute());
+  Serial.print(currentTime.minute());
   Serial.print(":");
-  Serial.println(now.second());
+  Serial.println(currentTime.second());
 
   snprintf(utcDateTime, sizeof(utcDateTime),
           "%04d-%02d-%02dT%02d:%02d:%02dZ",
-          now.year(),
-          now.month(),
-          now.day(),
-          now.hour(),
-          now.minute(),
-          now.second());
+          currentTime.year(),
+          currentTime.month(),
+          currentTime.day(),
+          currentTime.hour(),
+          currentTime.minute(),
+          currentTime.second());
 }
 
 // =====================================================
@@ -419,8 +466,8 @@ void readTime(){
 
 void readVoltage() {
 
-  float voltage = ina219.getBusVoltage_V();
-  float current = ina219.getCurrent_mA();
+  voltage = ina219.getBusVoltage_V();
+  current = ina219.getCurrent_mA();
 
   Serial.print("Napiecie: ");
   Serial.print(voltage);
@@ -450,17 +497,18 @@ void readVoltage() {
 // LIGHT SENSOR
 // =====================================================
 
-void readLuminosity() {
+void readLuminosity(const bool sendDataToApi) {
 
-  int analogueValue = analogRead(A0);
-  int digitalValue = digitalRead(D2);
+  lightSensorAnalogue = analogRead(A0);
+  lightSensorDigital = digitalRead(lightSensorControlPin);
 
   Serial.print("AnalogueValue: ");
-  Serial.println(analogueValue);
+  Serial.println(lightSensorAnalogue);
 
   Serial.print("DigitalValue: ");
-  Serial.println(digitalValue);
+  Serial.println(lightSensorDigital);
 
+  if (sendDataToApi) {
   char jsonBuffer[512];
 
   StaticJsonDocument<512> doc;
@@ -469,12 +517,13 @@ void readLuminosity() {
   doc["timestamp"] = utcDateTime;
   doc["location"] = location;
 
-  doc["analogueValue"] = analogueValue;
-  doc["digitalValue"] = digitalValue;
+  doc["analogueValue"] = lightSensorAnalogue;
+  doc["digitalValue"] = lightSensorDigital;
 
   serializeJson(doc, jsonBuffer);
 
   sendData("/LightSensor/Add", jsonBuffer);
+  }
 }
 
 // =====================================================
@@ -483,7 +532,7 @@ void readLuminosity() {
 
 void readTemperature() {
   sensors.requestTemperatures();
-  float temperature = sensors.getTempCByIndex(0);
+  temperature = sensors.getTempCByIndex(0);
 
   Serial.print("Temperature: ");
   Serial.print(temperature);
