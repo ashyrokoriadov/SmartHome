@@ -56,7 +56,7 @@ RTC_DS3231 rtc;
 // TEMPERATURE
 // =====================================================
 
-#define ONE_WIRE_BUS 3
+#define ONE_WIRE_BUS 4
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -104,15 +104,13 @@ void setup() {
   connectWiFi();
 
   if (rtc.begin()) {
-    Serial.println("Clock DS3231 found.");
     rtcInitialized = true;
    }
    else {
     Serial.println("WARNING: Clock DS3231 not found");
    }
 
-  sensors.begin();
-  Serial.println("Temperature sensor DS18B20 found.");
+  initializeSensors();
 
   if (!ina219.begin()) {    
     Serial.println("WARNING! Voltage sensor INA219 was not found.");
@@ -193,6 +191,32 @@ void loop() {
 }
 
 // =====================================================
+//INITIALIZE SENSORS
+// =====================================================
+
+void initializeSensors(){
+  sensors.begin();
+
+  Serial.print("Devices found: ");
+  Serial.println(sensors.getDeviceCount());
+
+  DeviceAddress addr;
+
+  if (sensors.getAddress(addr, 0)) {
+      Serial.println("Sensor detected");
+
+      for (uint8_t i = 0; i < 8; i++) {
+          if (addr[i] < 16) Serial.print("0");
+          Serial.print(addr[i], HEX);          
+      }
+
+      Serial.println();
+  } else {
+      Serial.println("No sensor found");
+  }
+}
+
+// =====================================================
 // WIFI CONNECT
 // =====================================================
 
@@ -203,7 +227,7 @@ void connectWiFi() {
   int status = WL_IDLE_STATUS;
 
   while (status != WL_CONNECTED) {
-
+    Serial.println("Connecting...");
     status = WiFi.begin(ssid, pass);
     delay(5000);
   }
@@ -211,20 +235,15 @@ void connectWiFi() {
   IPAddress ip;
 
   do {
-
     delay(1000);
-
     ip = WiFi.localIP();
-
     Serial.print("Waiting for IP... ");
-    Serial.println(ip);
-
-    char ipBuffer[16];
-    String ipStr = ip.toString();
-    ipStr.toCharArray(ipBuffer, sizeof(ipBuffer));
-    matrixPrint(ipBuffer);
-
   } while (ip[0] == 0);
+
+  char ipBuffer[16];
+  String ipStr = ip.toString();
+  ipStr.toCharArray(ipBuffer, sizeof(ipBuffer)); 
+  matrixPrint(ipBuffer);
 
   Serial.print("Device IP: ");
   Serial.println(ip);
