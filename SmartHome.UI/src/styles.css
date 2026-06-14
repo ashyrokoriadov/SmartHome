@@ -4,6 +4,7 @@
 	--panel:#ffffff;
 	--accent:#2ca58e; /* teal */
 	--accent-dark:#1f6a61;
+	--warn:#ffd24d;
 	--muted:#6b7a7a;
 	--card-shadow: 0 6px 18px rgba(34,50,50,0.06);
 }
@@ -68,19 +69,21 @@ table{table-layout:auto}
 /* Battery grid and gauges */
 .battery-grid{display:flex;gap:16px;align-items:flex-start;margin-top:8px}
 .battery-table{flex:1;min-width:480px}
-.battery-gauges{width:260px;display:flex;flex-direction:column;gap:12px}
-.gauge{display:flex;flex-direction:column;align-items:center;padding:12px}
+.battery-gauges{width:320px;display:flex;flex-direction:row;gap:12px;align-items:flex-start;justify-content:flex-end}
+.gauge{display:flex;flex-direction:column;align-items:center;padding:12px;flex:0 0 150px}
 .gauge-title{font-weight:600;color:var(--muted);margin-bottom:6px}
-.gauge-arc{width:200px;height:100px;border-radius:100px 100px 0 0;overflow:hidden;position:relative;
-	background: conic-gradient(
-		#34c06b 0deg 72deg,
-		#ffd24d 72deg 108deg,
-		#ff6b6b 108deg 180deg
-	);
-	transform: rotate(180deg); /* invert for semicircle */
-}
+.gauge-arc{width:140px;height:70px;border-radius:70px 70px 0 0;overflow:hidden;position:relative;transform: rotate(180deg); /* invert for semicircle */}
+.gauge-arc.voltage{background: conic-gradient(
+	var(--warn) 0deg 120deg,
+	var(--accent) 120deg 150deg,
+	var(--accent-dark) 150deg 180deg
+)}
+.gauge-arc.current{background: conic-gradient(
+	var(--accent) 0deg 90deg,
+	var(--accent-dark) 90deg 180deg
+)}
 .gauge-arc::after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:160px;height:80px;background:var(--panel);border-radius:80px 80px 0 0}
-.gauge-needle{position:absolute;left:50%;bottom:4px;width:2px;height:84px;background:#333;transform-origin:bottom center;border-radius:1px}
+.gauge-needle{position:absolute;left:50%;bottom:4px;width:2px;height:64px;background:#333;transform-origin:bottom center;border-radius:1px;transition:transform 0.6s cubic-bezier(.2,.9,.2,1)}
 .gauge-reading{margin-top:8px;font-size:1.25rem;font-weight:700;color:var(--accent-dark)}
 
 @media(max-width:920px){.battery-grid{flex-direction:column}.battery-gauges{width:100%;flex-direction:row;justify-content:space-around}}

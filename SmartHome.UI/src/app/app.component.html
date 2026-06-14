@@ -40,7 +40,7 @@
 	<div class="battery-gauges">
 		<div class="gauge widget">
 			<div class="gauge-title">Voltage</div>
-			<div class="gauge-arc" [style.--angle]="voltageAngle + 'deg'">
+			<div class="gauge-arc voltage" [style.--angle]="voltageAngle + 'deg'">
 				<div class="gauge-needle" [style.transform]="'rotate(' + (voltageAngle - 90) + 'deg)'" aria-hidden="true"></div>
 			</div>
 			<div class="gauge-reading">{{ displayedVoltage }} V</div>
@@ -48,7 +48,7 @@
 
 		<div class="gauge widget">
 			<div class="gauge-title">Current</div>
-			<div class="gauge-arc" [style.--angle]="currentAngle + 'deg'">
+			<div class="gauge-arc current" [style.--angle]="currentAngle + 'deg'">
 				<div class="gauge-needle" [style.transform]="'rotate(' + (currentAngle - 90) + 'deg)'" aria-hidden="true"></div>
 			</div>
 			<div class="gauge-reading">{{ displayedCurrent }} A</div>
