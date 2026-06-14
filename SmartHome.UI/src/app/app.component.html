@@ -2,6 +2,7 @@
 <button class="btn" (click)="checkHealth()">Check API Health</button>
 <p>{{ health }}</p>
 <hr />
+<h2>Battery State</h2>
 <button class="btn" (click)="getRangeT7()">Battery Data Refresh</button>
 <p *ngIf="rangeError" style="color:darkred">{{ rangeError }}</p>
 <div *ngIf="rangeLoading" style="display:flex;align-items:center;gap:8px;margin-top:8px">
