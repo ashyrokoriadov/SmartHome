@@ -1,15 +1,15 @@
 <h1>{{ title }}</h1>
-<button (click)="checkHealth()">Check API Health</button>
+<button class="btn" (click)="checkHealth()">Check API Health</button>
 <p>{{ health }}</p>
 <hr />
-<button (click)="getRangeT7()">Get T-7 Range Data</button>
+<button class="btn" (click)="getRangeT7()">Battery Data Refresh</button>
 <p *ngIf="rangeError" style="color:darkred">{{ rangeError }}</p>
 <div *ngIf="rangeLoading" style="display:flex;align-items:center;gap:8px;margin-top:8px">
 	<div class="spinner" aria-hidden="true" style="width:20px;height:20px;border-width:3px"></div>
 	<div class="loading-text">Loading range data…</div>
 </div>
 
-<table *ngIf="!rangeLoading && rangeData?.length" border="1" cellpadding="4" style="border-collapse:collapse;margin-top:8px">
+<table *ngIf="!rangeLoading && rangeData?.length" style="border-collapse:collapse;margin-top:8px">
 	<thead>
 		<tr>
 			<th>Timestamp</th>
@@ -34,14 +34,14 @@
 
 <hr />
 <h2>Light Sensor</h2>
-<button (click)="getLightRangeT7()">Get LightSensor T-7 Range</button>
+<button class="btn" (click)="getLightRangeT7()">Light Sensor Data Refresh</button>
 <p *ngIf="lightError" style="color:darkred">{{ lightError }}</p>
 <div *ngIf="lightLoading" style="display:flex;align-items:center;gap:8px;margin-top:8px">
 	<div class="spinner" aria-hidden="true" style="width:20px;height:20px;border-width:3px"></div>
 	<div class="loading-text">Loading light sensor data…</div>
 </div>
 
-<table *ngIf="!lightLoading && lightData?.length" border="1" cellpadding="4" style="border-collapse:collapse;margin-top:8px">
+<table *ngIf="!lightLoading && lightData?.length" style="border-collapse:collapse;margin-top:8px">
 	<thead>
 		<tr>
 			<th>Timestamp</th>
@@ -64,14 +64,14 @@
 
 <hr />
 <h2>Temperature</h2>
-<button (click)="getTemperatureRangeT7()">Get Temperature T-7 Range</button>
+<button class="btn" (click)="getTemperatureRangeT7()">Temperature Data Refresh</button>
 <p *ngIf="tempError" style="color:darkred">{{ tempError }}</p>
 <div *ngIf="tempLoading" style="display:flex;align-items:center;gap:8px;margin-top:8px">
 	<div class="spinner" aria-hidden="true" style="width:20px;height:20px;border-width:3px"></div>
 	<div class="loading-text">Loading temperature data…</div>
 </div>
 
-<table *ngIf="!tempLoading && tempData?.length" border="1" cellpadding="4" style="border-collapse:collapse;margin-top:8px">
+<table *ngIf="!tempLoading && tempData?.length" style="border-collapse:collapse;margin-top:8px">
 	<thead>
 		<tr>
 			<th>Timestamp</th>
