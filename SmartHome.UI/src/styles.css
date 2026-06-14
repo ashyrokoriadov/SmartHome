@@ -67,10 +67,10 @@ table{table-layout:auto}
 /* keep existing minimal reset */
 
 /* Battery grid and gauges */
-.battery-grid{display:flex;gap:16px;align-items:flex-start;margin-top:8px}
-.battery-table{flex:1;min-width:480px}
-.battery-gauges{width:320px;display:flex;flex-direction:row;gap:12px;align-items:flex-start;justify-content:flex-end}
-.gauge{display:flex;flex-direction:column;align-items:center;padding:12px;flex:0 0 150px}
+.battery-grid{display:flex;gap:8px;align-items:flex-start;margin-top:8px}
+.battery-table{flex:1;min-width:320px}
+.battery-gauges{width:220px;display:flex;flex-direction:row;gap:8px;align-items:flex-start;justify-content:flex-end}
+.gauge{display:flex;flex-direction:column;align-items:center;padding:8px;flex:0 0 110px}
 .gauge-title{font-weight:600;color:var(--muted);margin-bottom:6px}
 .gauge-arc{width:180px;height:90px;border-radius:90px 90px 0 0;overflow:hidden;position:relative;transform: rotate(180deg); /* invert for semicircle */}
 .gauge-arc.voltage{background: conic-gradient(
