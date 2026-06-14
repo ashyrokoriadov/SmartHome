@@ -57,3 +57,60 @@ TestResult.xml
 nunit-*.xml
 /.vs/SmartHome.slnx/v18/.suo
 .vs/
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Angular build output
+dist/
+out-tsc/
+bazel-out/
+
+# Angular cache
+.angular/
+.cache/
+.ng_build_cache/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (common practice)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+coverage/
+
+# Compiled output
+*.tsbuildinfo
+
+# Temporary files
+tmp/
+temp/
+
+# Firebase / AngularFire (if used)
+.firebase/
+
+# Angular SSR (if used)
+server/
+.prerendered/
+
+# Misc
+*.pid
+*.seed
