@@ -42,12 +42,18 @@ h2{margin:18px 0 8px 0;color:#234c47;font-size:1.05rem}
 .widget{background:var(--panel);padding:12px;border-radius:8px;box-shadow:var(--card-shadow);margin-top:12px}
 
 /* Tables */
-table{width:100%;background:var(--panel);border-collapse:collapse;border-radius:6px;overflow:hidden}
-table th, table td{padding:8px 10px;text-align:left;font-size:0.95rem}
-table thead th{background:linear-gradient(180deg,var(--accent-dark),var(--accent));color:#fff;font-weight:600}
+
+/* Tables: softer borders and intrinsic width */
+table{width:auto;max-width:100%;background:var(--panel);border-collapse:separate;border-spacing:0;border-radius:6px;overflow:hidden}
+table th, table td{padding:8px 10px;text-align:left;font-size:0.95rem;border-bottom:1px solid rgba(35,62,58,0.06)}
+table thead th{background:linear-gradient(180deg,var(--accent-dark),var(--accent));color:#fff;font-weight:600;border-bottom:2px solid rgba(0,0,0,0.08)}
 table tbody tr:nth-child(odd){background:#fbfffe}
 table tbody tr:hover{background:#f0fbf8}
-table th:first-child, table td:first-child{width:220px}
+table th:first-child, table td:first-child{width:160px}
+table{table-layout:auto}
+
+/* prevent table from stretching to full width; wrap if too wide */
+.table-wrap{overflow:auto}
 
 .no-data{color:var(--muted);padding:12px}
 
@@ -58,3 +64,23 @@ table th:first-child, table td:first-child{width:220px}
 .muted{color:var(--muted)}
 
 /* keep existing minimal reset */
+
+/* Battery grid and gauges */
+.battery-grid{display:flex;gap:16px;align-items:flex-start;margin-top:8px}
+.battery-table{flex:1;min-width:480px}
+.battery-gauges{width:260px;display:flex;flex-direction:column;gap:12px}
+.gauge{display:flex;flex-direction:column;align-items:center;padding:12px}
+.gauge-title{font-weight:600;color:var(--muted);margin-bottom:6px}
+.gauge-arc{width:200px;height:100px;border-radius:100px 100px 0 0;overflow:hidden;position:relative;
+	background: conic-gradient(
+		#34c06b 0deg 72deg,
+		#ffd24d 72deg 108deg,
+		#ff6b6b 108deg 180deg
+	);
+	transform: rotate(180deg); /* invert for semicircle */
+}
+.gauge-arc::after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:160px;height:80px;background:var(--panel);border-radius:80px 80px 0 0}
+.gauge-needle{position:absolute;left:50%;bottom:4px;width:2px;height:84px;background:#333;transform-origin:bottom center;border-radius:1px}
+.gauge-reading{margin-top:8px;font-size:1.25rem;font-weight:700;color:var(--accent-dark)}
+
+@media(max-width:920px){.battery-grid{flex-direction:column}.battery-gauges{width:100%;flex-direction:row;justify-content:space-around}}

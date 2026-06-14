@@ -9,28 +9,52 @@
 	<div class="loading-text">Loading range data…</div>
 </div>
 
-<table *ngIf="!rangeLoading && rangeData?.length" style="border-collapse:collapse;margin-top:8px">
-	<thead>
-		<tr>
-			<th>Timestamp</th>
-			<th>Location</th>
-			<th>Voltage</th>
-			<th>Current</th>
-			<th>Power</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr *ngFor="let r of rangeData">
-			<td>{{ r.timestamp }}</td>
-			<td>{{ r.location }}</td>
-			<td>{{ r.voltage }}</td>
-			<td>{{ r.current }}</td>
-			<td>{{ r.power }}</td>
-		</tr>
-	</tbody>
-</table>
+<div class="battery-grid">
+	<div class="battery-table">
+		<div class="table-wrap">
+			<table *ngIf="!rangeLoading && rangeData?.length" style="border-collapse:collapse;margin-top:8px">
+				<thead>
+					<tr>
+						<th>Timestamp</th>
+						<th>Location</th>
+						<th>Voltage</th>
+						<th>Current</th>
+						<th>Power</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let r of rangeData">
+						<td>{{ r.timestamp }}</td>
+						<td>{{ r.location }}</td>
+						<td>{{ r.voltage }}</td>
+						<td>{{ r.current }}</td>
+						<td>{{ r.power }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-<p *ngIf="!rangeLoading && !rangeData?.length">No data.</p>
+		<p *ngIf="!rangeLoading && !rangeData?.length">No data.</p>
+	</div>
+
+	<div class="battery-gauges">
+		<div class="gauge widget">
+			<div class="gauge-title">Voltage</div>
+			<div class="gauge-arc" [style.--angle]="voltageAngle + 'deg'">
+				<div class="gauge-needle" [style.transform]="'rotate(' + (voltageAngle - 90) + 'deg)'" aria-hidden="true"></div>
+			</div>
+			<div class="gauge-reading">{{ displayedVoltage }} V</div>
+		</div>
+
+		<div class="gauge widget">
+			<div class="gauge-title">Current</div>
+			<div class="gauge-arc" [style.--angle]="currentAngle + 'deg'">
+				<div class="gauge-needle" [style.transform]="'rotate(' + (currentAngle - 90) + 'deg)'" aria-hidden="true"></div>
+			</div>
+			<div class="gauge-reading">{{ displayedCurrent }} A</div>
+		</div>
+	</div>
+</div>
 
 <hr />
 <h2>Light Sensor</h2>

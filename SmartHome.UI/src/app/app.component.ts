@@ -26,6 +26,12 @@ export class AppComponent implements OnInit {
   tempRaw: string | null = null;
   tempParseError: string | null = null;
 
+  // Gauges for battery (display first record)
+  displayedVoltage = 0;
+  displayedCurrent = 0;
+  voltageAngle = 0; // 0-180
+  currentAngle = 0; // 0-180
+
   constructor(private api: ApiService) { }
 
   ngOnInit(): void {
@@ -62,6 +68,22 @@ export class AppComponent implements OnInit {
           this.rangeParseError = 'Parse error: ' + (err?.message || err);
           this.rangeData = [];
         }
+        // update gauges based on first value
+        if (this.rangeData && this.rangeData.length) {
+          const first = this.rangeData[0] as any;
+          const v = Number(first?.voltage) || 0;
+          const c = Number(first?.current) || 0;
+          this.displayedVoltage = Math.max(0, Math.min(15, v));
+          this.displayedCurrent = Math.max(0, Math.min(10, c));
+          this.voltageAngle = (this.displayedVoltage / 15) * 180;
+          this.currentAngle = (this.displayedCurrent / 10) * 180;
+        } else {
+          this.displayedVoltage = 0;
+          this.displayedCurrent = 0;
+          this.voltageAngle = 0;
+          this.currentAngle = 0;
+        }
+
         this.rangeLoading = false;
       },
       error: e => { this.rangeError = 'Error: ' + (e?.message || e); this.rangeLoading = false; }
