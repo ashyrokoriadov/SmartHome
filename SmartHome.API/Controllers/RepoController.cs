@@ -18,6 +18,12 @@ namespace SmartHome.API.Controllers
             return await Repo.GetAllAsync();
         }
 
+        [HttpGet("Range")]
+        public async Task<IEnumerable<T>> Get(DateTime start, DateTime end, int take = 10)
+        {
+            return await Repo.GetRangeAsync(start, end, take);
+        }
+
         [HttpPost("Add")]
         public async Task Add([FromBody] T battery)
         {

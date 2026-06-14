@@ -47,5 +47,7 @@ namespace SmartHome.API.Shared.Repos
         }
 
         public abstract Task<IEnumerable<T>> GetAllAsync();
+
+        public abstract Task<IEnumerable<T>> GetRangeAsync(DateTime start, DateTime end, int take);
     }
 }
