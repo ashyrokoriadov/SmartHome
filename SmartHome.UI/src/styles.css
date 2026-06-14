@@ -1,2 +1,60 @@
 /* Global styles */
-body { font-family: Arial, Helvetica, sans-serif; margin: 16px; }
+:root{
+	--bg:#f3f7f6;
+	--panel:#ffffff;
+	--accent:#2ca58e; /* teal */
+	--accent-dark:#1f6a61;
+	--muted:#6b7a7a;
+	--card-shadow: 0 6px 18px rgba(34,50,50,0.06);
+}
+
+html,body{height:100%;}
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 16px;
+	background: linear-gradient(180deg,#eef6f4 0%,var(--bg) 100%);
+	color: #233e3a;
+}
+
+/* Header */
+h1{margin:0 0 12px 0;color:var(--accent-dark);}
+h2{margin:18px 0 8px 0;color:#234c47;font-size:1.05rem}
+
+/* Controls */
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.btn{
+	background:var(--accent);
+	color:#fff;
+	border:none;
+	padding:8px 12px;
+	border-radius:6px;
+	cursor:pointer;
+	box-shadow: 0 4px 8px rgba(44,165,142,0.12);
+}
+.btn:active{transform:translateY(1px)}
+.btn.secondary{background:#fff;color:var(--accent);border:1px solid #d9eae6}
+
+.spinner{border:3px solid #e6f3f0;border-top-color:var(--accent);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--muted);font-size:0.95rem}
+
+/* Card / table container */
+.widget{background:var(--panel);padding:12px;border-radius:8px;box-shadow:var(--card-shadow);margin-top:12px}
+
+/* Tables */
+table{width:100%;background:var(--panel);border-collapse:collapse;border-radius:6px;overflow:hidden}
+table th, table td{padding:8px 10px;text-align:left;font-size:0.95rem}
+table thead th{background:linear-gradient(180deg,var(--accent-dark),var(--accent));color:#fff;font-weight:600}
+table tbody tr:nth-child(odd){background:#fbfffe}
+table tbody tr:hover{background:#f0fbf8}
+table th:first-child, table td:first-child{width:220px}
+
+.no-data{color:var(--muted);padding:12px}
+
+/* Responsive */
+@media(max-width:720px){.controls{flex-direction:column;align-items:stretch}.btn{width:100%}}
+
+/* small helpers used by app */
+.muted{color:var(--muted)}
+
+/* keep existing minimal reset */
