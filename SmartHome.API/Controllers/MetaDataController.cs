@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartHome.API.Shared.Interfaces;
 
 namespace SmartHome.API.Controllers
@@ -24,6 +25,16 @@ namespace SmartHome.API.Controllers
         public DateTime GetDateTimeUtc()
         {
             return _dateTimeProvider.Utc;
+        }
+
+        [HttpGet("diag")]
+        public IActionResult Diag([FromServices] AppDbContext ctx)
+        {
+            var conn = ctx.Database.GetDbConnection().ConnectionString;
+            var batteryCount = ctx.BatteryStates.Count();
+            var tempCount = ctx.TemperatureData.Count();
+            var lightCount = ctx.LightSensorData.Count();
+            return Ok(new { conn, batteryCount, tempCount, lightCount });
         }
     }
 }

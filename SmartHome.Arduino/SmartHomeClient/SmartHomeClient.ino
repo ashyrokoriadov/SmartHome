@@ -47,7 +47,7 @@ const int serverPort = 5000;
 // =====================================================
 
 unsigned long lastSend = 0;
-unsigned long interval = 15 * 1000;
+unsigned long interval = 2 * 60 * 1000;
 bool rtcInitialized = false;
 
 RTC_DS3231 rtc;
@@ -86,6 +86,8 @@ Adafruit_INA219 ina219;
 // =====================================================
 
 void setup() {
+
+  //rtc.adjust(DateTime(2026, 6, 19, 18 10, 0));
 
   Serial.begin(115200);
 
@@ -142,12 +144,12 @@ void loop() {
     if (!isHealthy)
     {
       matrixPrintStatic("E0");
-      interval = 15 * 60 * 1000;
+      interval = 30 * 60 * 1000;
       return;
     }
     else
     {
-      interval = 15 * 1000;
+      interval = 2 * 60 * 1000;
     }
 
     bool correlationOk = httpGet(
@@ -237,7 +239,7 @@ void connectWiFi() {
   do {
     delay(1000);
     ip = WiFi.localIP();
-    Serial.print("Waiting for IP... ");
+    Serial.println("Waiting for IP... ");
   } while (ip[0] == 0);
 
   char ipBuffer[16];
