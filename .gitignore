@@ -114,3 +114,4 @@ server/
 # Misc
 *.pid
 *.seed
+/SmartHome.API/Properties/PublishProfiles/FolderProfile.pubxml.user

@@ -85,10 +85,7 @@ Adafruit_INA219 ina219;
 // SETUP
 // =====================================================
 
-void setup() {
-
-  //rtc.adjust(DateTime(2026, 6, 19, 18 10, 0));
-
+void setup() { 
   Serial.begin(115200);
 
   pinMode(lightSensorControlPin, INPUT);
@@ -129,6 +126,8 @@ void loop() {
     Serial.println("WiFi disconnected!");
     connectWiFi();
   }
+
+  setClockIfNeeded();
 
   if (millis() - lastSend >= interval) {
 
@@ -180,10 +179,6 @@ void loop() {
       return;
     }
 
-    // ==========================================
-    // SEND SENSOR DATA
-    // ==========================================
-
     readVoltage();
     readLuminosity(true);
     readTemperature();
@@ -192,9 +187,49 @@ void loop() {
   }
 }
 
-// =====================================================
-//INITIALIZE SENSORS
-// =====================================================
+void setClockIfNeeded()
+{
+    if (currentTime.year() < 2002)
+    {
+        if (httpGet("/MetaData/DateTimeUtc",
+                    utcDateTime,
+                    sizeof(utcDateTime)))
+        {
+            int year, month, day;
+            int hour, minute, second;
+
+            int parsed = sscanf(
+                utcDateTime,
+                "%d-%d-%dT%d:%d:%d",
+                &year,
+                &month,
+                &day,
+                &hour,
+                &minute,
+                &second
+            );
+
+            if (parsed == 6)
+            {
+                rtc.adjust(DateTime(
+                    year,
+                    month,
+                    day,
+                    hour,
+                    minute,
+                    second
+                ));
+
+                Serial.println("RTC synchronized");
+            }
+            else
+            {
+                Serial.print("Failed to parse datetime: ");
+                Serial.println(utcDateTime);
+            }
+        }
+    }
+}
 
 void initializeSensors(){
   sensors.begin();
