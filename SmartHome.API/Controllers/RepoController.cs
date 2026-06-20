@@ -6,10 +6,12 @@ namespace SmartHome.API.Controllers
     public class RepoController<T> :  ControllerBase
     {
         protected readonly IRepo<T> Repo;
+        protected readonly ILogger<RepoController<T>> Logger;
 
-        public RepoController(IRepo<T> repo)
+        public RepoController(IRepo<T> repo, ILogger<RepoController<T>> logger)
         {
             Repo = repo;
+            Logger = logger;
         }
 
         [HttpGet]
@@ -25,15 +27,17 @@ namespace SmartHome.API.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task Add([FromBody] T battery)
+        public async Task Add([FromBody] T entity)
         {
-            await Repo.AddAsync(battery);
+            Logger.LogInformation("Adding new data: {Entity}", entity);
+            await Repo.AddAsync(entity);
         }
 
         [HttpPost("AddRange")]
-        public async Task AddRange([FromBody] IEnumerable<T> batteries)
+        public async Task AddRange([FromBody] IEnumerable<T> entities)
         {
-            await Repo.AddRangeAsync(batteries);
+            Logger.LogInformation("Adding new data: {Entities}", entities);
+            await Repo.AddRangeAsync(entities);
         }
     }
 }

@@ -4,6 +4,6 @@
     {
         public static string Section => nameof(ConnectionStrings);
 
-        public string SqlLightConnection {  get; set; }
+        public string SqlLightConnection { get; set; } = "Data Source=D:\\Temp\\SmartHome.db";
     }
 }

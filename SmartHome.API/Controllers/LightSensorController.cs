@@ -8,6 +8,6 @@ namespace SmartHome.API.Controllers
     [Route("[controller]")]
     public class LightSensorController :  RepoController<LightSensorData>
     {
-        public LightSensorController(ILightSensorDataRepo repo) : base(repo) { }        
+        public LightSensorController(ILightSensorDataRepo repo, ILogger<LightSensorController> logger) : base(repo, logger) { }        
     }
 }

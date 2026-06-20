@@ -8,6 +8,6 @@ namespace SmartHome.API.Controllers
     [Route("[controller]")]
     public class TemperatureController : RepoController<TemperatureData>
     {
-        public TemperatureController(ITemperatureDataRepo repo) : base(repo) { }       
+        public TemperatureController(ITemperatureDataRepo repo, ILogger<TemperatureController> logger) : base(repo, logger) { }       
     }
 }
