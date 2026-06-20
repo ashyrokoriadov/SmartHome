@@ -1,0 +1,152 @@
+#include <Arduino.h>
+#include <WiFiS3.h>
+
+#include "App.h"
+#include "Config.h"
+#include <ArduinoJson.h>
+#include <ArduinoGraphics.h>
+#include <Arduino_LED_Matrix.h>
+
+void App::setup()
+{
+    Serial.begin(115200);
+
+    // initialize peripherals
+    display.begin();
+
+    connectWiFi();
+
+    sensorService.begin();
+    clockService.begin();
+
+    clockService.syncIfNeeded(apiClient);
+}
+
+void App::loop()
+{
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        connectWiFi();
+    }
+
+    unsigned long now = millis();
+
+    if (now - lastUpdate >= updateInterval)
+    {
+        lastUpdate = now;
+
+        clockService.syncIfNeeded(apiClient);
+
+        sendMeasurements();
+    }
+}
+
+void App::connectWiFi()
+{
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        return;
+    }
+
+    Serial.print("Connecting to WiFi");
+
+    while (WiFi.begin(WIFI_SSID, WIFI_PASSWORD) != WL_CONNECTED)
+    {
+        Serial.print(".");
+        delay(5000);
+    }
+
+    Serial.println();
+    Serial.println("WiFi connected");
+
+    // show IP on matrix
+    IPAddress ip = WiFi.localIP();
+    char ipBuffer[16];
+    String ipStr = ip.toString();
+    ipStr.toCharArray(ipBuffer, sizeof(ipBuffer));
+    display.printScroll(ipBuffer);
+}
+
+void App::sendMeasurements()
+{
+    SensorData data = sensorService.readAll();
+
+    char timestamp[32];
+    clockService.formatUtc(timestamp, sizeof(timestamp));
+
+    Serial.println(timestamp);
+
+    // Health check
+    if (!apiClient.healthCheck())
+    {
+        display.printStatic("E0");
+        updateInterval = 30UL * 60UL * 1000UL; // 30 minutes
+        return;
+    }
+    else
+    {
+        updateInterval = 2UL * 60UL * 1000UL; // 2 minutes
+    }
+
+    // Fetch correlation id from API
+    char correlationId[128] = "";
+
+    if (!apiClient.get(
+            "/MetaData/CorrelationId",
+            correlationId,
+            sizeof(correlationId)))
+    {
+        Serial.println("Failed to fetch correlation id");
+        display.printStatic("E1");
+        return;
+    }
+
+    // Temperature payload
+    {
+        StaticJsonDocument<512> doc;
+        char jsonBuffer[512];
+
+        doc["correlationId"] = correlationId;
+        doc["timestamp"] = timestamp;
+        doc["location"] = LOCATION;
+        doc["temperature"] = data.temperature;
+
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+
+        apiClient.post("/Temperature/Add", jsonBuffer);
+    }
+
+    // Light sensor payload
+    {
+        StaticJsonDocument<512> doc;
+        char jsonBuffer[512];
+
+        doc["correlationId"] = correlationId;
+        doc["timestamp"] = timestamp;
+        doc["location"] = LOCATION;
+        doc["analogueValue"] = data.lightAnalog;
+        doc["digitalValue"] = data.lightDigital;
+
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+
+        apiClient.post("/LightSensor/Add", jsonBuffer);
+    }
+
+    // Battery payload
+    {
+        StaticJsonDocument<512> doc;
+        char jsonBuffer[512];
+
+        doc["correlationId"] = correlationId;
+        doc["timestamp"] = timestamp;
+        doc["location"] = LOCATION;
+        doc["voltage"] = data.voltage;
+        doc["current"] = data.current;
+
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+
+        apiClient.post("/Battery/Add", jsonBuffer);
+    }
+
+    display.printStatic("OK");
+}
