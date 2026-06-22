@@ -8,7 +8,7 @@
 #include <RTClib.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <Adafruit_INA219.h>
+//#include <Adafruit_INA219.h>
 
 // =====================================================
 // CONTROL PINS
@@ -79,7 +79,7 @@ ArduinoLEDMatrix matrix;
 // VOLTAGE / CURRENT
 // =====================================================
 
-Adafruit_INA219 ina219;
+//Adafruit_INA219 ina219;
 
 // =====================================================
 // SETUP
@@ -110,10 +110,11 @@ void setup() {
    }
 
   initializeSensors();
-
+/*
   if (!ina219.begin()) {    
     Serial.println("WARNING! Voltage sensor INA219 was not found.");
   }
+  */
 }
 
 // =====================================================
@@ -179,7 +180,7 @@ void loop() {
       return;
     }
 
-    readVoltage();
+    //readVoltage();
     readLuminosity(true);
     readTemperature();
 
@@ -299,7 +300,7 @@ void toggleLightIfPossible(){
   bool timeCondition = (hour >= 19 && hour <= 23);
   bool lightCondition = (lightSensorDigital == 1);
 
-  if (timeCondition || lightCondition) {
+  if (timeCondition && lightCondition) {
     digitalWrite(lampsControlPin, HIGH);
     Serial.println("Lamps are turned on. ");
     Serial.print("timeCondition = ");
@@ -522,8 +523,8 @@ void readTime(){
 
 void readVoltage() {
 
-  voltage = ina219.getBusVoltage_V();
-  current = ina219.getCurrent_mA();
+  //voltage = ina219.getBusVoltage_V();
+  //current = ina219.getCurrent_mA();
 
   Serial.print("Napiecie: ");
   Serial.print(voltage);
