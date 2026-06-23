@@ -50,8 +50,8 @@ SensorData SensorService::readAll()
     SensorData data;
 
     data.temperature = readTemperature();
-    data.voltage = readVoltage();
-    data.current = readCurrent();
+    //data.voltage = readVoltage();
+    //data.current = readCurrent();
 
     data.lightAnalog = readLightAnalog();
     data.lightDigital = readLightDigital();

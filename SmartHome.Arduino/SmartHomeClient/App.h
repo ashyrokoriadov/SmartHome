@@ -4,6 +4,7 @@
 #include "ClockService.h"
 #include "SensorService.h"
 #include "MatrixDisplay.h"
+#include "LightingService.h"
 
 class App {
 public:
@@ -15,6 +16,7 @@ private:
     ClockService clockService;
     SensorService sensorService;
     MatrixDisplay display;
+    LightingService lightingService;
 
     unsigned long lastUpdate = 0;
     unsigned long updateInterval = 120000;

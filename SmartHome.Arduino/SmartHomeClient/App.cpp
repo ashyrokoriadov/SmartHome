@@ -6,13 +6,18 @@
 #include <ArduinoJson.h>
 #include <ArduinoGraphics.h>
 #include <Arduino_LED_Matrix.h>
+#include "LightingService.h"
+
+unsigned long lastSend = 0;
 
 void App::setup()
 {
-    Serial.begin(115200);
+    unsigned long start = millis();
 
-    // initialize peripherals
-    display.begin();
+    Serial.begin(115200);
+    while (!Serial && millis() - start < 3000);
+    
+    display.begin(); 
 
     connectWiFi();
 
@@ -27,15 +32,15 @@ void App::loop()
     if (WiFi.status() != WL_CONNECTED)
     {
         connectWiFi();
-    }
+    }   
 
-    unsigned long now = millis();
+    lightingService.toggleLightIfPossible(); 
 
-    if (now - lastUpdate >= updateInterval)
+    if (millis() - lastSend >= API_REQUEST_INTERVAL)
     {
-        lastUpdate = now;
+        lastSend = millis();
 
-        clockService.syncIfNeeded(apiClient);
+        clockService.syncIfNeeded(apiClient);        
 
         sendMeasurements();
     }
@@ -80,12 +85,12 @@ void App::sendMeasurements()
     if (!apiClient.healthCheck())
     {
         display.printStatic("E0");
-        updateInterval = 30UL * 60UL * 1000UL; // 30 minutes
+        updateInterval = API_REQUEST_FAIL_WAIT_TIME; 
         return;
     }
     else
     {
-        updateInterval = 2UL * 60UL * 1000UL; // 2 minutes
+        updateInterval = API_REQUEST_INTERVAL; 
     }
 
     // Fetch correlation id from API
@@ -133,6 +138,7 @@ void App::sendMeasurements()
     }
 
     // Battery payload
+    /*
     {
         StaticJsonDocument<512> doc;
         char jsonBuffer[512];
@@ -147,6 +153,7 @@ void App::sendMeasurements()
 
         apiClient.post("/Battery/Add", jsonBuffer);
     }
+    */
 
     display.printStatic("OK");
 }
