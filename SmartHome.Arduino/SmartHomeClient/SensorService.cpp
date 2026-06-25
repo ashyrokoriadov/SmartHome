@@ -9,11 +9,11 @@ bool SensorService::begin()
 
     pinMode(LIGHT_DIGITAL_PIN, INPUT);
 
-    if (!ina219.begin())
-    {
-        Serial.println("INA219 not found");
-        return false;
-    }
+    //if (!ina219.begin())
+    //{
+    //    Serial.println("INA219 not found");
+    //    return false;
+    //}
 
     return true;
 }
@@ -27,12 +27,14 @@ float SensorService::readTemperature()
 
 float SensorService::readVoltage()
 {
-    return ina219.getBusVoltage_V();
+    return 0.1;
+    //return ina219.getBusVoltage_V();
 }
 
 float SensorService::readCurrent()
 {
-    return ina219.getCurrent_mA() / 1000.0f;
+    return 0.1;
+    //return ina219.getCurrent_mA() / 1000.0f;
 }
 
 int SensorService::readLightAnalog()

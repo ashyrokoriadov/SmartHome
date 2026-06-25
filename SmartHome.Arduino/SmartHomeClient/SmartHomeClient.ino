@@ -1,6 +1,7 @@
 #include "App.h"
 
-App app;
+ClockService clockService;
+App app(clockService);  
 
 void setup() {
   app.setup();

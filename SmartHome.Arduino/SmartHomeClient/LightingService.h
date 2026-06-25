@@ -5,9 +5,10 @@
 
 class LightingService {
 public:
+    LightingService(ClockService& clock);
     void toggleLightIfPossible();
 
 private:
-    ClockService clockService;
+    ClockService& clockService;
     SensorService sensorService;
 };

@@ -8,23 +8,30 @@ bool ClockService::begin()
 {
     if (!rtc.begin())
     {
-        Serial.println("RTC not found");
+        Serial.println("RTC not found.");
         return false;
     }
 
+    Serial.println("RTC found.");
     return true;
 }
 
-void ClockService::syncIfNeeded(ApiClient& apiClient)
+void ClockService::syncIfNeeded(ApiClient apiClient)
 {
+    Serial.println("Trying to sync clock.");
+
     DateTime currentTime = rtc.now();
+    Serial.print("Current time set is ");
+    Serial.println(currentTime.timestamp());
 
     if (currentTime.year() >= 2002)
     {
+        Serial.println("No need to sync the clock.");
         return;
     }
 
     char utcDateTime[128];
+    memset(utcDateTime, 0, sizeof(utcDateTime));
 
     if (!apiClient.get(
             "/MetaData/DateTimeUtc",
@@ -35,6 +42,11 @@ void ClockService::syncIfNeeded(ApiClient& apiClient)
         return;
     }
 
+    trimGarbage(utcDateTime);
+
+    Serial.print("CLEANED: ");
+    Serial.println(utcDateTime);
+
     int year;
     int month;
     int day;
@@ -44,7 +56,7 @@ void ClockService::syncIfNeeded(ApiClient& apiClient)
 
     int parsed = sscanf(
         utcDateTime,
-        "%d-%d-%dT%d:%d:%d",
+        "%d-%d-%d %d:%d:%d",
         &year,
         &month,
         &day,
@@ -94,4 +106,24 @@ void ClockService::formatUtc(
         current.minute(),
         current.second()
     );
+}
+
+void ClockService::trimGarbage(char* str)
+{
+    size_t len = strlen(str);
+
+    if (len <= 3)
+    {
+        str[0] = '\0';
+        return;
+    }
+
+    // shift left by 2 chars
+    for (size_t i = 0; i < len - 2; i++)
+    {
+        str[i] = str[i + 2];
+    }
+
+    // remove last character
+    str[len - 3] = '\0';
 }

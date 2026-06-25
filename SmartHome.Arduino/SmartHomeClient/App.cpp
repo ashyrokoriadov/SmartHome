@@ -8,7 +8,10 @@
 #include <Arduino_LED_Matrix.h>
 #include "LightingService.h"
 
-unsigned long lastSend = 0;
+App::App(ClockService& clock)
+    : clockService(clock),
+      lightingService(clock)
+{}
 
 void App::setup()
 {
@@ -24,24 +27,34 @@ void App::setup()
     sensorService.begin();
     clockService.begin();
 
+    Serial.println("SETUP - Before syncronizing a clock.");
     clockService.syncIfNeeded(apiClient);
+
+    pinMode(LAMPS_CONTROL_PIN, OUTPUT);
 }
 
 void App::loop()
 {
+    Serial.println("LOOP - Starting loop.");
+
     if (WiFi.status() != WL_CONNECTED)
     {
         connectWiFi();
     }   
 
+    Serial.println("LOOP - Toggling lights.");
     lightingService.toggleLightIfPossible(); 
+
+    Serial.println("LOOP - Evaluating interval length.");
 
     if (millis() - lastSend >= API_REQUEST_INTERVAL)
     {
         lastSend = millis();
 
+        Serial.println("LOOP - Before syncronizing a clock.");
         clockService.syncIfNeeded(apiClient);        
 
+        Serial.println("LOOP - Before sending measurements.");
         sendMeasurements();
     }
 }
@@ -55,26 +68,30 @@ void App::connectWiFi()
 
     Serial.print("Connecting to WiFi");
 
+    IPAddress ip(192, 168, 1, 217);
+    IPAddress gateway(192, 168, 1, 1);
+    IPAddress subnet(255, 255, 255, 0);
+    IPAddress primaryDNS(8, 8, 8, 8);
+
+    WiFi.config(ip, gateway, subnet, primaryDNS);
+
     while (WiFi.begin(WIFI_SSID, WIFI_PASSWORD) != WL_CONNECTED)
     {
         Serial.print(".");
-        delay(5000);
+        delay(2000);
     }
 
     Serial.println();
     Serial.println("WiFi connected");
 
-    // show IP on matrix
-    IPAddress ip = WiFi.localIP();
-    char ipBuffer[16];
-    String ipStr = ip.toString();
-    ipStr.toCharArray(ipBuffer, sizeof(ipBuffer));
-    display.printScroll(ipBuffer);
+    display.printScroll("WiFi OK");
 }
 
 void App::sendMeasurements()
 {
+    Serial.println("Reading measurements...");
     SensorData data = sensorService.readAll();
+    Serial.println("Measurements have been read.");
 
     char timestamp[32];
     clockService.formatUtc(timestamp, sizeof(timestamp));

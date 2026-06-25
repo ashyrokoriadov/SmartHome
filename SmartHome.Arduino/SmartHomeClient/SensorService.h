@@ -4,7 +4,7 @@
 #include "Config.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <Adafruit_INA219.h>
+//#include <Adafruit_INA219.h>
 
 struct SensorData {
     float temperature;
@@ -32,5 +32,5 @@ private:
     OneWire oneWire{ONE_WIRE_PIN};
     DallasTemperature temperatureSensor{&oneWire};
 
-    Adafruit_INA219 ina219;
+    //Adafruit_INA219 ina219;
 };

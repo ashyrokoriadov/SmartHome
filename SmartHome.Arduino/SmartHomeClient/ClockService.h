@@ -9,7 +9,7 @@ class ClockService {
 public:
     bool begin();
 
-    void syncIfNeeded(ApiClient& apiClient);
+    void syncIfNeeded(ApiClient apiClient);
 
     DateTime now();
 
@@ -17,4 +17,5 @@ public:
 
 private:
     RTC_DS3231 rtc;
+    void trimGarbage(char* str);
 };

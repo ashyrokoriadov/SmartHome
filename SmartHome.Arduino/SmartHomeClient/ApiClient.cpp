@@ -18,7 +18,7 @@ bool ApiClient::get(
 
     if (!client.connect(API_HOST, API_PORT))
     {
-        Serial.println("Connection failed");
+        Serial.println("Connection failed - GET");
         return false;
     }
 
@@ -43,7 +43,7 @@ bool ApiClient::post(
 
     if (!client.connect(API_HOST, API_PORT))
     {
-        Serial.println("Connection failed");
+        Serial.println("Connection failed - POST");
         return false;
     }
 
@@ -90,30 +90,33 @@ bool ApiClient::readResponse(
         }
     }
 
-    bool bodyStarted = false;
+    // ---- skip HTTP headers ----
+    String line;
+    while (client.connected())
+    {
+        line = client.readStringUntil('\n');
+        if (line == "\r" || line.length() <= 1)
+            break;
+    }
+
+    memset(response, 0, responseSize);
+
     size_t index = 0;
 
-    while (client.connected() || client.available())
+    // IMPORTANT FIX: read until connection closes, NOT available()
+    while (client.connected())
     {
-        String line = client.readStringUntil('\n');
-
-        if (!bodyStarted)
-        {
-            if (line == "\r")
-            {
-                bodyStarted = true;
-            }
-
+        if (!client.available())
             continue;
-        }
 
-        line.trim();
+        char c = client.read();
 
-        for (size_t i = 0; i < line.length(); i++)
+        if (index < responseSize - 1)
         {
-            if (index < responseSize - 1)
+            // only keep printable chars
+            if (c >= 32 && c <= 126)
             {
-                response[index++] = line[i];
+                response[index++] = c;
             }
         }
     }
@@ -121,6 +124,5 @@ bool ApiClient::readResponse(
     response[index] = '\0';
 
     client.stop();
-
     return true;
 }

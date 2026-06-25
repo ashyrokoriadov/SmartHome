@@ -4,10 +4,22 @@
 #include "LightingService.h"
 #include "Config.h"
 
+LightingService::LightingService(ClockService& clock)
+    : clockService(clock)
+{
+    // optional initialization code
+}
+
 void LightingService::toggleLightIfPossible()
 {
+
     DateTime currentTime = clockService.now();
+    Serial.print("LightingService - currentTime: ");
+    Serial.println(currentTime.timestamp());
+
     bool lightSensorDigital = sensorService.readLightDigital();
+    Serial.print("LightingService - lightSensorDigital: ");
+    Serial.println(lightSensorDigital);
 
     int hour = currentTime.hour();
 
