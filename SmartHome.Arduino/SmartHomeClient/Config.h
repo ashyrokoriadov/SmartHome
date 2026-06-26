@@ -11,8 +11,8 @@ constexpr uint8_t LIGHT_DIGITAL_PIN = 2;
 constexpr uint8_t LAMPS_CONTROL_PIN = 7;
 
 // WiFi credentials (fill in your network SSID and password)
-constexpr char WIFI_SSID[] = "YOUR_SSID";
-constexpr char WIFI_PASSWORD[] = "YOUR_PASSWORD";
+constexpr char WIFI_SSID[] = "CISZA NOCNA 2200 - 0700";
+constexpr char WIFI_PASSWORD[] = "CP3FY3UT";
 
 // Default device location
 constexpr char LOCATION[] = "Balcony";
@@ -24,5 +24,6 @@ constexpr int MATRIX_TEXT_SCROLL_SPEED = 160;
 constexpr int MATRIX_TEXT_Y = 1;
 constexpr int MATRIX_WIDTH = 12; // used for centering static text
 
-const unsigned long API_REQUEST_INTERVAL = 2UL * 60UL * 1000UL; // 2 minutes
+//const unsigned long API_REQUEST_INTERVAL = 2UL * 60UL * 1000UL; // 2 minutes
+const unsigned long API_REQUEST_INTERVAL = 5UL * 1000UL; // 5 seconds
 const unsigned long API_REQUEST_FAIL_WAIT_TIME = 30UL * 60UL * 1000UL; // 30 minutes

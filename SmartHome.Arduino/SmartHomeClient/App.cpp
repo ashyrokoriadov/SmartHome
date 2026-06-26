@@ -35,27 +35,24 @@ void App::setup()
 
 void App::loop()
 {
-    Serial.println("LOOP - Starting loop.");
-
     if (WiFi.status() != WL_CONNECTED)
     {
         connectWiFi();
     }   
 
-    Serial.println("LOOP - Toggling lights.");
     lightingService.toggleLightIfPossible(); 
-
-    Serial.println("LOOP - Evaluating interval length.");
 
     if (millis() - lastSend >= API_REQUEST_INTERVAL)
     {
         lastSend = millis();
 
-        Serial.println("LOOP - Before syncronizing a clock.");
-        clockService.syncIfNeeded(apiClient);        
+        Serial.println("LOOP, IF condition - Before syncronizing a clock.");
+        clockService.syncIfNeeded(apiClient);  
+        Serial.println("LOOP, IF condition - After syncronizing a clock.");      
 
-        Serial.println("LOOP - Before sending measurements.");
+        Serial.println("LOOP, IF condition - Before sending measurements.");
         sendMeasurements();
+        Serial.println("LOOP, IF condition - After sending measurements.");
     }
 }
 
