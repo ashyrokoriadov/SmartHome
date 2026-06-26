@@ -5,6 +5,7 @@ using SmartHome.API.Shared.Interfaces;
 using SmartHome.API.Shared.Repos;
 using SmartHome.Shared.Repos.Interfaces;
 using System.Reflection;
+using SmartHome.API.Shared.Repos.Interfaces;
 
 namespace SmartHome.API
 {
@@ -29,6 +30,7 @@ namespace SmartHome.API
             builder.Services.AddScoped<IBatteryStateRepo, BatteryStateRepo>();
             builder.Services.AddScoped<ILightSensorDataRepo, LightSensorDataRepo>();
             builder.Services.AddScoped<ITemperatureDataRepo, TemperatureDataRepo>();
+            builder.Services.AddScoped<ILogsRepo, LogsRepo>();
             builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
             builder.Services.AddEndpointsApiExplorer();
