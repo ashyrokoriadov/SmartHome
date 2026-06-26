@@ -22,9 +22,9 @@ namespace SmartHome.API.Controllers
         }
 
         [HttpGet("DateTimeUtc")]
-        public DateTime GetDateTimeUtc()
+        public string GetDateTimeUtc()
         {
-            return _dateTimeProvider.Utc;
+            return _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         [HttpGet("diag")]
