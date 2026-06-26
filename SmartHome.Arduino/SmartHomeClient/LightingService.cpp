@@ -10,7 +10,6 @@ LightingService::LightingService(ClockService& clock)
 
 void LightingService::toggleLightIfPossible()
 {
-
     DateTime currentTime = clockService.now();
 
     bool lightSensorDigital = sensorService.readLightDigital();

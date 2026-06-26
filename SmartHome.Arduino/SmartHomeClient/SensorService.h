@@ -12,7 +12,7 @@ struct SensorData {
     float current;
 
     int lightAnalog;
-    bool lightDigital;
+    int lightDigital;
 };
 
 class SensorService {
@@ -26,7 +26,7 @@ public:
     float readCurrent();
 
     int readLightAnalog();
-    bool readLightDigital();
+    int readLightDigital();
 
 private:
     OneWire oneWire{ONE_WIRE_PIN};

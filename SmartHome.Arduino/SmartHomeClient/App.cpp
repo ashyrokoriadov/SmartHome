@@ -27,9 +27,6 @@ void App::setup()
     sensorService.begin();
     clockService.begin();
 
-    Serial.println("SETUP - Before syncronizing a clock.");
-    clockService.syncIfNeeded(apiClient);
-
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
 }
 
@@ -40,19 +37,13 @@ void App::loop()
         connectWiFi();
     }   
 
-    lightingService.toggleLightIfPossible(); 
+    //lightingService.toggleLightIfPossible(); 
 
     if (millis() - lastSend >= API_REQUEST_INTERVAL)
     {
         lastSend = millis();
-
-        Serial.println("LOOP, IF condition - Before syncronizing a clock.");
         clockService.syncIfNeeded(apiClient);  
-        Serial.println("LOOP, IF condition - After syncronizing a clock.");      
-
-        Serial.println("LOOP, IF condition - Before sending measurements.");
         sendMeasurements();
-        Serial.println("LOOP, IF condition - After sending measurements.");
     }
 }
 
@@ -86,30 +77,26 @@ void App::connectWiFi()
 
 void App::sendMeasurements()
 {
-    Serial.println("Reading measurements...");
     SensorData data = sensorService.readAll();
-    Serial.println("Measurements have been read.");
 
     char timestamp[32];
     clockService.formatUtc(timestamp, sizeof(timestamp));
 
-    Serial.println(timestamp);
-
-    // Health check
-    if (!apiClient.healthCheck())
+    bool isHealthy = apiClient.healthCheck();
+    if (!isHealthy)
     {
         display.printStatic("E0");
         updateInterval = API_REQUEST_FAIL_WAIT_TIME; 
+        Serial.println("Unhealthy.");
         return;
     }
     else
     {
         updateInterval = API_REQUEST_INTERVAL; 
+        Serial.println("Healthy.");
     }
 
-    // Fetch correlation id from API
     char correlationId[128] = "";
-
     if (!apiClient.get(
             "/MetaData/CorrelationId",
             correlationId,
@@ -130,9 +117,8 @@ void App::sendMeasurements()
         doc["location"] = LOCATION;
         doc["temperature"] = data.temperature;
 
-        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
-
-        apiClient.post("/Temperature/Add", jsonBuffer);
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));        
+        apiClient.post("/Temperature/Add", jsonBuffer);         
     }
 
     // Light sensor payload

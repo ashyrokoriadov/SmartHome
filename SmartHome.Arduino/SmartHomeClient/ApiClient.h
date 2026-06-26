@@ -25,4 +25,5 @@ private:
         char* response,
         size_t responseSize
     );
+    void trimGarbage(char* str);
 };

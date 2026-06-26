@@ -17,5 +17,4 @@ public:
 
 private:
     RTC_DS3231 rtc;
-    void trimGarbage(char* str);
 };

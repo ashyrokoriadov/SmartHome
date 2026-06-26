@@ -42,7 +42,7 @@ int SensorService::readLightAnalog()
     return analogRead(LIGHT_ANALOG_PIN);
 }
 
-bool SensorService::readLightDigital()
+int SensorService::readLightDigital()
 {
     return digitalRead(LIGHT_DIGITAL_PIN);
 }

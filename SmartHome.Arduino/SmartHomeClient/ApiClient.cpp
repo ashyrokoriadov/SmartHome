@@ -18,7 +18,6 @@ bool ApiClient::get(
 
     if (!client.connect(API_HOST, API_PORT))
     {
-        Serial.println("Connection failed - GET");
         return false;
     }
 
@@ -43,7 +42,6 @@ bool ApiClient::post(
 
     if (!client.connect(API_HOST, API_PORT))
     {
-        Serial.println("Connection failed - POST");
         return false;
     }
 
@@ -71,7 +69,7 @@ bool ApiClient::healthCheck()
 {
     char response[32];
 
-    return get("/health", response, sizeof(response));
+    return get("/HealthCheck", response, sizeof(response));
 }
 
 bool ApiClient::readResponse(
@@ -123,6 +121,46 @@ bool ApiClient::readResponse(
 
     response[index] = '\0';
 
+    trimGarbage(response);
+
     client.stop();
     return true;
+}
+
+void ApiClient::trimGarbage(char* str)
+{
+    size_t len = strlen(str);
+
+    if (len <= 3)
+    {
+        str[0] = '\0';
+        return;
+    }
+
+    // shift left by 2 chars
+    for (size_t i = 0; i < len - 2; i++)
+    {
+        str[i] = str[i + 2];
+    }
+
+    // remove last character
+    str[len - 3] = '\0';
+
+    // Remove quotes from beginning and end if present
+    len = strlen(str);
+    if (len > 0 && str[0] == '"')
+    {
+        // shift left to remove opening quote
+        for (size_t i = 0; i < len - 1; i++)
+        {
+            str[i] = str[i + 1];
+        }
+        len--;
+    }
+
+    if (len > 0 && str[len - 1] == '"')
+    {
+        // remove closing quote
+        str[len - 1] = '\0';
+    }
 }

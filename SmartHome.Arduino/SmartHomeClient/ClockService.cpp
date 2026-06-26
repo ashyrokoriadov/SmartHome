@@ -11,18 +11,12 @@ bool ClockService::begin()
         Serial.println("RTC not found.");
         return false;
     }
-
-    Serial.println("RTC found.");
     return true;
 }
 
 void ClockService::syncIfNeeded(ApiClient apiClient)
 {
-    Serial.println("Trying to sync clock.");
-
     DateTime currentTime = rtc.now();
-    Serial.print("Current time set is ");
-    Serial.println(currentTime.timestamp());
 
     if (currentTime.year() >= 2002)
     {
@@ -41,11 +35,6 @@ void ClockService::syncIfNeeded(ApiClient apiClient)
         Serial.println("Failed to get UTC time");
         return;
     }
-
-    trimGarbage(utcDateTime);
-
-    Serial.print("CLEANED: ");
-    Serial.println(utcDateTime);
 
     int year;
     int month;
@@ -108,22 +97,3 @@ void ClockService::formatUtc(
     );
 }
 
-void ClockService::trimGarbage(char* str)
-{
-    size_t len = strlen(str);
-
-    if (len <= 3)
-    {
-        str[0] = '\0';
-        return;
-    }
-
-    // shift left by 2 chars
-    for (size_t i = 0; i < len - 2; i++)
-    {
-        str[i] = str[i + 2];
-    }
-
-    // remove last character
-    str[len - 3] = '\0';
-}
