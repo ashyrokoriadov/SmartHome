@@ -28,6 +28,8 @@ void App::setup()
     clockService.begin();
 
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
+
+    updateInterval = API_REQUEST_INTERVAL;
 }
 
 void App::loop()
@@ -39,7 +41,7 @@ void App::loop()
 
     //lightingService.toggleLightIfPossible(); 
 
-    if (millis() - lastSend >= API_REQUEST_INTERVAL)
+    if (millis() - lastSend >= updateInterval)
     {
         lastSend = millis();
         clockService.syncIfNeeded(apiClient);  
@@ -107,6 +109,10 @@ void App::sendMeasurements()
         return;
     }
 
+    bool temperaturePostResult = false;
+    bool lightPostResult = false;
+    bool electricalPostResult = false;
+
     // Temperature payload
     {
         StaticJsonDocument<512> doc;
@@ -117,8 +123,9 @@ void App::sendMeasurements()
         doc["location"] = LOCATION;
         doc["temperature"] = data.temperature;
 
-        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));        
-        apiClient.post("/Temperature/Add", jsonBuffer);         
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));  
+        
+        temperaturePostResult = apiClient.post("/Temperature/Add", jsonBuffer);    
     }
 
     // Light sensor payload
@@ -134,7 +141,7 @@ void App::sendMeasurements()
 
         serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
 
-        apiClient.post("/LightSensor/Add", jsonBuffer);
+        lightPostResult = apiClient.post("/LightSensor/Add", jsonBuffer);
     }
 
     // Battery payload
@@ -155,8 +162,28 @@ void App::sendMeasurements()
 
         serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
 
-        apiClient.post("/Battery/Add", jsonBuffer);
+        electricalPostResult = apiClient.post("/Battery/Add", jsonBuffer);
     }
 
-    display.printStatic("OK");
+    if (temperaturePostResult & lightPostResult & electricalPostResult)
+    {
+        display.printStatic("OK");
+    }
+    else
+    {
+        if (!temperaturePostResult)
+        {
+            display.printStatic("TF");
+        }
+
+        if (!lightPostResult)
+        {
+            display.printStatic("LF");
+        }
+
+        if (!electricalPostResult)
+        {
+            display.printStatic("EF");
+        }
+    }    
 }

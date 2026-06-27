@@ -21,6 +21,8 @@ bool ApiClient::get(
         return false;
     }
 
+    client.setTimeout(3000);
+
     client.print("GET ");
     client.print(endpoint);
     client.println(" HTTP/1.1");
@@ -45,6 +47,8 @@ bool ApiClient::post(
         return false;
     }
 
+    client.setTimeout(3000);
+
     client.print("POST ");
     client.print(endpoint);
     client.println(" HTTP/1.1");
@@ -60,9 +64,59 @@ bool ApiClient::post(
     client.println("Connection: close");
     client.println();
 
-    client.print(payload);
+    size_t written = client.print(payload);
+    client.println();
+    client.flush();
 
-    return true;
+    bool sent = written > 0;
+
+    if (!sent)
+    {
+        client.stop();
+        return false;
+    }
+
+    unsigned long timeout = millis();
+    while (!client.available() && millis() - timeout < 5000)
+    {
+        delay(10);
+    }
+
+    if (!client.available())
+    {
+        client.stop();
+        return false;
+    }
+
+    String statusLine = client.readStringUntil('\n');
+    if (statusLine.length() == 0)
+    {
+        client.stop();
+        return false;
+    }
+
+    int statusCode = 0;
+    int spaceIndex = statusLine.indexOf(' ');
+    if (spaceIndex >= 0)
+    {
+        String codeText = statusLine.substring(spaceIndex + 1, spaceIndex + 4);
+        statusCode = codeText.toInt();
+    }
+
+    while (client.connected())
+    {
+        if (client.available())
+        {
+            client.read();
+        }
+        else
+        {
+            delay(10);
+        }
+    }
+
+    client.stop();
+    return statusCode >= 200 && statusCode < 300;
 }
 
 bool ApiClient::healthCheck()
@@ -79,18 +133,20 @@ bool ApiClient::readResponse(
 {
     unsigned long timeout = millis();
 
-    while (!client.available())
+    while (!client.available() && millis() - timeout < 5000)
     {
-        if (millis() - timeout > 5000)
-        {
-            client.stop();
-            return false;
-        }
+        delay(10);
+    }
+
+    if (!client.available())
+    {
+        client.stop();
+        return false;
     }
 
     // ---- skip HTTP headers ----
     String line;
-    while (client.connected())
+    while (client.connected() && millis() - timeout < 5000)
     {
         line = client.readStringUntil('\n');
         if (line == "\r" || line.length() <= 1)
@@ -100,23 +156,30 @@ bool ApiClient::readResponse(
     memset(response, 0, responseSize);
 
     size_t index = 0;
+    bool sawData = false;
 
-    // IMPORTANT FIX: read until connection closes, NOT available()
-    while (client.connected())
+    while (millis() - timeout < 5000)
     {
-        if (!client.available())
-            continue;
-
-        char c = client.read();
-
-        if (index < responseSize - 1)
+        while (client.available())
         {
-            // only keep printable chars
-            if (c >= 32 && c <= 126)
+            char c = static_cast<char>(client.read());
+            sawData = true;
+
+            if (index < responseSize - 1)
             {
-                response[index++] = c;
+                if (c >= 32 && c <= 126)
+                {
+                    response[index++] = c;
+                }
             }
         }
+
+        if (!client.connected() && !client.available())
+        {
+            break;
+        }
+
+        delay(10);
     }
 
     response[index] = '\0';
@@ -124,43 +187,53 @@ bool ApiClient::readResponse(
     trimGarbage(response);
 
     client.stop();
-    return true;
+    return sawData;
 }
 
 void ApiClient::trimGarbage(char* str)
 {
-    size_t len = strlen(str);
+    if (str == nullptr)
+    {
+        return;
+    }
 
-    if (len <= 3)
+    size_t len = strlen(str);
+    if (len < 2)
+    {
+        return;
+    }
+
+    size_t start = 0;
+    size_t end = len;
+
+    if (len >= 2)
+    {
+        start = 2;
+    }
+
+    if (end >= 1)
+    {
+        end -= 1;
+    }
+
+    if (start >= end)
     {
         str[0] = '\0';
         return;
     }
 
-    // shift left by 2 chars
-    for (size_t i = 0; i < len - 2; i++)
+    size_t contentLen = end - start;
+    if (contentLen > 0)
     {
-        str[i] = str[i + 2];
+        memmove(str, str + start, contentLen);
     }
 
-    // remove last character
-    str[len - 3] = '\0';
+    str[contentLen] = '\0';
 
-    // Remove quotes from beginning and end if present
     len = strlen(str);
-    if (len > 0 && str[0] == '"')
+    if (len >= 2 && str[0] == '"' && str[len - 1] == '"')
     {
-        // shift left to remove opening quote
-        for (size_t i = 0; i < len - 1; i++)
-        {
-            str[i] = str[i + 1];
-        }
-        len--;
-    }
-
-    if (len > 0 && str[len - 1] == '"')
-    {
-        // remove closing quote
-        str[len - 1] = '\0';
+        memmove(str, str + 1, len - 2);
+        str[len - 2] = '\0';
     }
 }
