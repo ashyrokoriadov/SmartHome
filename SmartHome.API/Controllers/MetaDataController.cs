@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SmartHome.API.Shared;
 using SmartHome.API.Shared.Interfaces;
 
 namespace SmartHome.API.Controllers
@@ -9,22 +10,28 @@ namespace SmartHome.API.Controllers
     public class MetaDataController :  ControllerBase
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly ILogger<MetaDataController> _logger;
 
-        public MetaDataController(IDateTimeProvider dateTimeProvider)
+        public MetaDataController(IDateTimeProvider dateTimeProvider, ILogger<MetaDataController> logger)
         {
             _dateTimeProvider = dateTimeProvider;
+            _logger = logger;
         }
 
         [HttpGet("CorrelationId")]
         public Guid GetCorrelationId()
         {
-            return Guid.NewGuid();
+            var correlationId = Guid.NewGuid(); 
+            _logger.LogInformation("Generated correlation ID: {CorrelationId}", correlationId);
+            return correlationId;
         }
 
         [HttpGet("DateTimeUtc")]
         public string GetDateTimeUtc()
         {
-            return _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss");
+            var dateTimeUtcNowResponse = _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss");
+            _logger.LogInformation("Retrieved UTC date/time: {DateTimeUtc}", dateTimeUtcNowResponse);
+            return dateTimeUtcNowResponse;
         }
 
         [HttpGet("diag")]
@@ -34,6 +41,7 @@ namespace SmartHome.API.Controllers
             var batteryCount = ctx.BatteryStates.Count();
             var tempCount = ctx.TemperatureData.Count();
             var lightCount = ctx.LightSensorData.Count();
+            _logger.LogInformation("Diagnostic info - Connection: {Connection}, Battery: {BatteryCount}, Temperature: {TempCount}, Light: {LightCount}", conn, batteryCount, tempCount, lightCount);
             return Ok(new { conn, batteryCount, tempCount, lightCount });
         }
     }
