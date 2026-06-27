@@ -22,7 +22,7 @@ namespace SmartHome.API.Controllers
         public Guid GetCorrelationId()
         {
             var correlationId = Guid.NewGuid(); 
-            _logger.LogInformation("Generated correlation ID: {CorrelationId}", correlationId);
+            _logger.LogInformation("Generated correlation ID: {CorrelationId}, timestamp UTC: {DateTimeUtc}", correlationId, _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss"));
             return correlationId;
         }
 
@@ -30,7 +30,7 @@ namespace SmartHome.API.Controllers
         public string GetDateTimeUtc()
         {
             var dateTimeUtcNowResponse = _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss");
-            _logger.LogInformation("Retrieved UTC date/time: {DateTimeUtc}", dateTimeUtcNowResponse);
+            _logger.LogInformation("Retrieved UTC date/time: {DateTimeUtc}, timestampUTC : {DateTimeUtc}", dateTimeUtcNowResponse, _dateTimeProvider.Utc.ToString("yyyy-MM-dd HH:mm:ss"));
             return dateTimeUtcNowResponse;
         }
 
