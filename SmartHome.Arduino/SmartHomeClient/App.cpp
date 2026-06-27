@@ -138,7 +138,6 @@ void App::sendMeasurements()
     }
 
     // Battery payload
-    /*
     {
         StaticJsonDocument<512> doc;
         char jsonBuffer[512];
@@ -146,14 +145,18 @@ void App::sendMeasurements()
         doc["correlationId"] = correlationId;
         doc["timestamp"] = timestamp;
         doc["location"] = LOCATION;
-        doc["voltage"] = data.voltage;
-        doc["current"] = data.current;
+        doc["Voltage"] = data.voltage;
+        doc["Current"] = data.current;
+        doc["PanelVoltage"] = data.panelVoltage;
+        doc["PanelPower"] = data.panelPower;
+        doc["ChargerState"] = data.chargerState;
+        doc["Error"] = data.error;
+        doc["GainedEnergyToday"] = data.gainedEnergyToday;
 
         serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
 
         apiClient.post("/Battery/Add", jsonBuffer);
     }
-    */
 
     display.printStatic("OK");
 }
