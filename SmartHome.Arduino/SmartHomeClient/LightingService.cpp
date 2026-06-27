@@ -47,7 +47,7 @@ void LightingService::toggleLightIfPossible()
     if (changed)
     {
         Serial.print("Lamps are turned = ");
-        Serial.println(turnedOn);
+        Serial.print(turnedOn);
         Serial.print("; timeCondition = ");
         Serial.print(timeCondition);
         Serial.print("; lightCondition = ");
