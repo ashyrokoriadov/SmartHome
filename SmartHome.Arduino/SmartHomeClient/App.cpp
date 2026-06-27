@@ -171,19 +171,29 @@ void App::sendMeasurements()
     }
     else
     {
+        String errorMessage = "";
+
         if (!temperaturePostResult)
         {
-            display.printStatic("TF");
+            errorMessage += "TF ";
         }
 
         if (!lightPostResult)
         {
-            display.printStatic("LF");
+            errorMessage += "LF ";
         }
 
         if (!electricalPostResult)
         {
-            display.printStatic("EF");
+            errorMessage += "EF ";
         }
+
+        errorMessage.trim();
+
+        if (errorMessage.length() > 0) 
+        {
+            display.printScroll(errorMessage.c_str());
+            display.printStatic("FAIL");
+        }   
     }    
 }

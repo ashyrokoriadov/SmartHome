@@ -53,8 +53,5 @@ void LightingService::toggleLightIfPossible()
         Serial.print("; lightCondition = ");
         Serial.print(lightCondition);
         Serial.println(".");
-    }
-
-    
-        
+    }        
 }
