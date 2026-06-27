@@ -8,6 +8,11 @@ LightingService::LightingService(ClockService& clock)
     : clockService(clock)
 { }
 
+bool timeCondition = false;
+bool lightCondition = false;
+bool changed = false;
+bool turnedOn = false;
+
 void LightingService::toggleLightIfPossible()
 {
     DateTime currentTime = clockService.now();
@@ -16,27 +21,40 @@ void LightingService::toggleLightIfPossible()
 
     int hour = currentTime.hour();
 
-    bool timeCondition = (hour >= 17 && hour <= 21);
-    bool lightCondition = (lightSensorDigital == 1);
+    bool timeConditionActual = (hour >= 17 && hour <= 21);
+    bool lightConditionActual = (lightSensorDigital == 1);
 
-    if (timeCondition && lightCondition) {
+    if((timeCondition != timeConditionActual) || (lightCondition != lightConditionActual))
+    {
+        changed = true;
+    }
+    else
+    {
+        changed = false;
+    }
+
+    timeCondition = timeConditionActual;
+    lightCondition = lightConditionActual;
+    turnedOn = timeCondition && lightCondition;
+
+    if (turnedOn) {
         digitalWrite(LAMPS_CONTROL_PIN, HIGH);
-
-        Serial.println("Lamps are turned on. ");
-        Serial.print("timeCondition = ");
-        Serial.print(timeCondition);
-        Serial.print("; lightCondition = ");
-        Serial.print(lightCondition);
-        Serial.println(".");
     }
     else {
         digitalWrite(LAMPS_CONTROL_PIN, LOW);
+    }
 
-        Serial.print("Lamps are turned off. ");
-        Serial.print("timeCondition = ");
+    if (changed)
+    {
+        Serial.print("Lamps are turned = ");
+        Serial.println(turnedOn);
+        Serial.print("; timeCondition = ");
         Serial.print(timeCondition);
         Serial.print("; lightCondition = ");
         Serial.print(lightCondition);
         Serial.println(".");
     }
+
+    
+        
 }

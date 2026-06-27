@@ -39,7 +39,7 @@ void App::loop()
         connectWiFi();
     }   
 
-    //lightingService.toggleLightIfPossible(); 
+    lightingService.toggleLightIfPossible(); 
 
     if (millis() - lastSend >= updateInterval)
     {

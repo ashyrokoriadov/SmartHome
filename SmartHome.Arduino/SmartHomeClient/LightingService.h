@@ -11,4 +11,9 @@ public:
 private:
     ClockService& clockService;
     SensorService sensorService;
+
+    bool timeCondition;
+    bool lightCondition;
+    bool changed;
+    bool turnedOn;
 };
