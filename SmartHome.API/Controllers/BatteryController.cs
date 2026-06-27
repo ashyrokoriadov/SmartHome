@@ -6,7 +6,7 @@ namespace SmartHome.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BatteryController : RepoController<BatteryState>
+    public class BatteryController : RepoController<ElectricalSensor>
     {
         public BatteryController(IBatteryStateRepo repo, ILogger<BatteryController> logger) : base(repo, logger) { }      
     }
