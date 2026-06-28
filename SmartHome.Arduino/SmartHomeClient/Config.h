@@ -9,8 +9,8 @@ constexpr uint8_t ONE_WIRE_PIN = 4;
 constexpr uint8_t LIGHT_ANALOG_PIN = A0;
 constexpr uint8_t LIGHT_DIGITAL_PIN = 2;
 constexpr uint8_t LAMPS_CONTROL_PIN = 7;
-constexpr uint8_t VICRON_RX_PIN = 8;
-constexpr uint8_t VICRON_TX_PIN = 9;
+constexpr uint8_t VICTRON_RX_PIN = 8;
+constexpr uint8_t VICTRON_TX_PIN = 9;
 
 // WiFi credentials (fill in your network SSID and password)
 constexpr char WIFI_SSID[] = "SECRET";

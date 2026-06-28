@@ -39,7 +39,7 @@ private:
 
     OneWire oneWire{ONE_WIRE_PIN};
     DallasTemperature temperatureSensor{&oneWire};
-    SoftwareSerial victronSerial{VICRON_RX_PIN, VICRON_TX_PIN};
+    SoftwareSerial victronSerial{VICTRON_RX_PIN, VICTRON_TX_PIN};
 
     float lastVoltage = 0.0f;
     float lastCurrent = 0.0f;
