@@ -33,7 +33,9 @@ bool ApiClient::get(
     client.println("Connection: close");
     client.println();
 
-    return readResponse(client, response, responseSize);
+    int statusCode = 0;
+    bool result = readResponse(client, response, responseSize, &statusCode);
+    return result && statusCode >= 200 && statusCode < 300;
 }
 
 bool ApiClient::post(
@@ -129,7 +131,8 @@ bool ApiClient::healthCheck()
 bool ApiClient::readResponse(
     WiFiClient& client,
     char* response,
-    size_t responseSize)
+    size_t responseSize,
+    int* statusCode)
 {
     unsigned long timeout = millis();
 
@@ -140,8 +143,37 @@ bool ApiClient::readResponse(
 
     if (!client.available())
     {
+        if (statusCode)
+        {
+            *statusCode = 0;
+        }
         client.stop();
         return false;
+    }
+
+    String statusLine = client.readStringUntil('\n');
+    if (statusLine.length() == 0)
+    {
+        if (statusCode)
+        {
+            *statusCode = 0;
+        }
+        client.stop();
+        return false;
+    }
+
+    if (statusCode)
+    {
+        int spaceIndex = statusLine.indexOf(' ');
+        if (spaceIndex >= 0)
+        {
+            String codeText = statusLine.substring(spaceIndex + 1, spaceIndex + 4);
+            *statusCode = codeText.toInt();
+        }
+        else
+        {
+            *statusCode = 0;
+        }
     }
 
     // ---- skip HTTP headers ----

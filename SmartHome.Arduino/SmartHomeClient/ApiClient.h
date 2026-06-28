@@ -23,7 +23,8 @@ private:
     bool readResponse(
         WiFiClient& client,
         char* response,
-        size_t responseSize
+        size_t responseSize,
+        int* statusCode = nullptr
     );
     void trimGarbage(char* str);
 };
