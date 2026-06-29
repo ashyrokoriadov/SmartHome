@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartHome.API.Shared.Constants;
+using SmartHome.API.Shared.Interfaces;
 using SmartHome.Shared.Models;
 
 using SmartHome.Shared.Repos.Interfaces;
@@ -6,7 +8,11 @@ namespace SmartHome.API.Shared.Repos
 {
     public class BatteryStateRepo : DataRepo<ElectricalSensor>, IBatteryStateRepo
     {
-        public BatteryStateRepo(AppDbContext context) : base(context) { }
+        public BatteryStateRepo(AppDbContext context, IInfluxClient influxClient) : base(context, influxClient) { }
+
+        protected override string MeasurementName => MeasurementTypes.Electricity;
+
+        protected override string BucketName => InfluxBuckets.Electricity;
 
 
         public override async Task<IEnumerable<ElectricalSensor>> GetAllAsync()
@@ -24,6 +30,19 @@ namespace SmartHome.API.Shared.Repos
                 .OrderByDescending(d => d.Timestamp)
                 .Take(take)
                 .ToListAsync();
+        }
+
+        protected override Dictionary<string, object> GetValuesFromEntry(ElectricalSensor entry)
+        {
+            return new Dictionary<string, object>
+            {
+                { "Voltage", entry.Voltage },
+                { "Current", entry.Current },
+                { "Power", entry.Power },
+                { "PanelVoltage", entry.PanelVoltage },
+                { "PanelPower", entry.PanelPower },
+                { "GainedEnergyToday", entry.GainedEnergyToday }
+            };           
         }
     }
 }

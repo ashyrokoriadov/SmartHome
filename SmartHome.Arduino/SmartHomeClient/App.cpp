@@ -28,6 +28,7 @@ void App::setup()
     clockService.begin();
 
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
+    pinMode(VICTRON_RX_PIN, INPUT)
 
     updateInterval = API_REQUEST_INTERVAL;
 }

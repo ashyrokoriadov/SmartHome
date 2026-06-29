@@ -21,7 +21,7 @@ void LightingService::toggleLightIfPossible()
 
     int hour = currentTime.hour();
 
-    bool timeConditionActual = (hour >= 17 && hour <= 21);
+    bool timeConditionActual = (hour >= 17 && hour < 21);
     bool lightConditionActual = (lightSensorDigital == 1);
 
     if((timeCondition != timeConditionActual) || (lightCondition != lightConditionActual))

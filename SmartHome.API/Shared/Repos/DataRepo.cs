@@ -1,14 +1,23 @@
-﻿using SmartHome.Shared.Interfaces;
+﻿using SmartHome.API.Shared.Interfaces;
+using SmartHome.Shared.Interfaces;
 
 namespace SmartHome.API.Shared.Repos
 {
     public abstract class DataRepo<T> : IRepo<T>
     {
         protected readonly AppDbContext Context;
+        protected readonly IInfluxClient InfluxClient;
 
-        public DataRepo(AppDbContext context)
+        protected abstract string MeasurementName { get; }
+
+        protected abstract string BucketName { get; }
+
+        protected virtual bool InfluxEnabled => true;
+
+        public DataRepo(AppDbContext context, IInfluxClient influxClient)
         {
             Context = context;
+            InfluxClient = influxClient;
         }
 
         public async Task AddAsync(T entry)
@@ -20,6 +29,7 @@ namespace SmartHome.API.Shared.Repos
 
             Context.Add(entry);
             await Context.SaveChangesAsync();
+            await WriteToInfluxAsync(entry);
         }
 
         public async Task AddRangeAsync(IEnumerable<T> entries)
@@ -39,6 +49,10 @@ namespace SmartHome.API.Shared.Repos
                 Context.Add(entry);
             }
             await Context.SaveChangesAsync();
+            foreach (var entry in entries)
+            {
+                await WriteToInfluxAsync(entry);
+            }
         }
 
         public Task<IEnumerable<T>> FilterAsync(Predicate<T> predicate)
@@ -49,5 +63,16 @@ namespace SmartHome.API.Shared.Repos
         public abstract Task<IEnumerable<T>> GetAllAsync();
 
         public abstract Task<IEnumerable<T>> GetRangeAsync(DateTime start, DateTime end, int take);
+
+        protected virtual async Task WriteToInfluxAsync(T entry)
+        {
+            if (InfluxEnabled)
+            {
+                var values = GetValuesFromEntry(entry);
+                await InfluxClient.Write(BucketName, MeasurementName, values);
+            }
+        }
+
+        protected abstract Dictionary<string, object> GetValuesFromEntry(T entry);
     }
 }

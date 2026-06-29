@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using SmartHome.API.Shared;
 using SmartHome.API.Options;
+using SmartHome.API.Shared;
+using SmartHome.API.Shared.Influx;
 using SmartHome.API.Shared.Interfaces;
 using SmartHome.API.Shared.Repos;
+using SmartHome.API.Shared.Repos.Interfaces;
 using SmartHome.Shared.Repos.Interfaces;
 using System.Reflection;
-using SmartHome.API.Shared.Repos.Interfaces;
 
 namespace SmartHome.API
 {
@@ -23,6 +24,7 @@ namespace SmartHome.API
 
             // Bind ConnectionStrings options from configuration
             builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.Section));
+            builder.Services.Configure<InfluxOptions>(builder.Configuration.GetSection(InfluxOptions.Section));
 
             // Use configured connection string for DbContext
             var sqliteConn = builder.Configuration.GetConnectionString("SqlLightConnection");
@@ -32,6 +34,7 @@ namespace SmartHome.API
             builder.Services.AddScoped<ITemperatureDataRepo, TemperatureDataRepo>();
             builder.Services.AddScoped<ILogsRepo, LogsRepo>();
             builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+            builder.Services.AddScoped<IInfluxClient, InfluxClient>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(

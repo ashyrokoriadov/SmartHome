@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SmartHome.API.Shared.Interfaces;
 using SmartHome.API.Shared.Models.Logs;
 using SmartHome.API.Shared.Repos.Interfaces;
 
@@ -6,7 +7,13 @@ namespace SmartHome.API.Shared.Repos
 {
     public class LogsRepo : DataRepo<LogEntry>, ILogsRepo
     {
-        public LogsRepo(AppDbContext context) : base(context) { }
+        public LogsRepo(AppDbContext context, IInfluxClient influxClient) : base(context, influxClient) { }
+
+        protected override bool InfluxEnabled => false;
+
+        protected override string MeasurementName => throw new NotImplementedException();
+
+        protected override string BucketName => throw new NotImplementedException();
 
         public override async Task<IEnumerable<LogEntry>> GetAllAsync()
         {
@@ -23,6 +30,11 @@ namespace SmartHome.API.Shared.Repos
                 .OrderByDescending(l => l.Timestamp)
                 .Take(take)
                 .ToListAsync();
+        }
+
+        protected override Dictionary<string, object> GetValuesFromEntry(LogEntry entry)
+        {
+            throw new NotSupportedException("InfluxDB is not enabled for log entries.");
         }
     }
 }
