@@ -20,10 +20,21 @@ bool SensorService::begin()
 
 void SensorService::readVictronTelemetry()
 {
+    static bool hasLoggedVictronData = false;
+    static unsigned long lastVictronLogMillis = 0;
+    static unsigned long lastVictronActivityMillis = 0;
+
+    const unsigned long victronLogInterval = 2000UL;
+    const unsigned long victronIdleLogInterval = 10000UL;
+
     String line;
+    bool receivedData = false;
 
     while (victronSerial.available())
     {
+        receivedData = true;
+        lastVictronActivityMillis = millis();
+
         char c = static_cast<char>(victronSerial.read());
 
         if (c == '\n' || c == '\r')
@@ -38,6 +49,22 @@ void SensorService::readVictronTelemetry()
         {
             line += c;
         }
+    }
+
+    if (receivedData)
+    {
+        const unsigned long now = millis();
+        if (!hasLoggedVictronData || (now - lastVictronLogMillis >= victronLogInterval))
+        {
+            Serial.println(F("Victron telemetry received."));
+            lastVictronLogMillis = now;
+            hasLoggedVictronData = true;
+        }
+    }
+    else if (hasLoggedVictronData && (millis() - lastVictronActivityMillis >= victronIdleLogInterval))
+    {
+        Serial.println(F("Victron idle: no new telemetry."));
+        lastVictronActivityMillis = millis();
     }
 }
 
