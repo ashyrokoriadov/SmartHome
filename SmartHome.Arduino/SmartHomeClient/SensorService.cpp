@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
+#include <string.h>
 
 #include "Config.h"
 #include "SensorService.h"
@@ -29,21 +30,11 @@ void SensorService::readVictronTelemetry()
     const unsigned long victronLogInterval = 2000UL;
     const unsigned long victronIdleLogInterval = 10000UL;
 
-    String line;
+    char line[48];
+    size_t lineLength = 0;
     bool receivedData = false;
 
-    bool victronAvailable = victronSerial.available();
-    Serial.println(victronAvailable);
-
-    int rc = victronSerial.begin(19200);
-    Serial.print("SoftwareSerial begin = ");
-    Serial.println(rc);
-
-    //int rc1 = Serial1.begin(19200);
-    //Serial.print("Serial1 begin = ");
-    //Serial.println(rc1);
-
-    while (victronAvailable)
+    while (victronSerial.available())
     {
         receivedData = true;
         lastVictronActivityMillis = millis();
@@ -52,15 +43,16 @@ void SensorService::readVictronTelemetry()
 
         if (c == '\n' || c == '\r')
         {
-            if (line.length() > 0)
+            if (lineLength > 0)
             {
+                line[lineLength] = '\0';
                 parseVictronLine(line);
-                line = "";
+                lineLength = 0;
             }
         }
-        else
+        else if (lineLength < sizeof(line) - 1)
         {
-            line += c;
+            line[lineLength++] = c;
         }
     }
 
@@ -81,55 +73,78 @@ void SensorService::readVictronTelemetry()
     }
 }
 
-void SensorService::parseVictronLine(const String& line)
+void SensorService::parseVictronLine(const char* line)
 {
-    int separatorIndex = line.indexOf(' ');
-    if (separatorIndex < 0)
+    if (line == nullptr || line[0] == '\0')
     {
         return;
     }
 
-    String field = line.substring(0, separatorIndex);
-    String valueText = line.substring(separatorIndex + 1);
+    char field[8];
+    char valueText[24];
 
-    if (field == "V")
+    const char* separator = strchr(line, '\t');
+    if (separator == nullptr)
+    {
+        separator = strchr(line, ' ');
+    }
+
+    if (separator == nullptr)
+    {
+        return;
+    }
+
+    const size_t fieldLength = static_cast<size_t>(separator - line);
+    if (fieldLength == 0 || fieldLength >= sizeof(field))
+    {
+        return;
+    }
+
+    memcpy(field, line, fieldLength);
+    field[fieldLength] = '\0';
+
+    const char* value = separator + 1;
+    strncpy(valueText, value, sizeof(valueText) - 1);
+    valueText[sizeof(valueText) - 1] = '\0';
+
+    if (strcmp(field, "V") == 0)
     {
         lastVoltage = parseVictronValue(valueText, true);
     }
-    else if (field == "I")
+    else if (strcmp(field, "I") == 0)
     {
         lastCurrent = parseVictronValue(valueText, true);
     }
-    else if (field == "VPV")
+    else if (strcmp(field, "VPV") == 0)
     {
         lastPanelVoltage = parseVictronValue(valueText, true);
     }
-    else if (field == "PPV")
+    else if (strcmp(field, "PPV") == 0)
     {
         lastPanelPower = parseVictronValue(valueText, false);
     }
-    else if (field == "CS")
+    else if (strcmp(field, "CS") == 0)
     {
-        lastChargerState = atoi(valueText.c_str());
+        lastChargerState = atoi(valueText);
     }
-    else if (field == "ERR")
+    else if (strcmp(field, "ERR") == 0)
     {
-        lastError = atoi(valueText.c_str());
+        lastError = atoi(valueText);
     }
-    else if (field == "H19")
+    else if (strcmp(field, "H19") == 0)
     {
         lastGainedEnergyToday = parseVictronValue(valueText, false);
     }
 }
 
-float SensorService::parseVictronValue(const String& valueText, bool divideBy1000) const
+float SensorService::parseVictronValue(const char* valueText, bool divideBy1000) const
 {
-    if (valueText.length() == 0)
+    if (valueText == nullptr || valueText[0] == '\0')
     {
         return 0.0f;
     }
 
-    float value = static_cast<float>(atof(valueText.c_str()));
+    const float value = static_cast<float>(atof(valueText));
     return divideBy1000 ? value / 1000.0f : value;
 }
 

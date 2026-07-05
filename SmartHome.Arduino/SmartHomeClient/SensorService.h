@@ -5,6 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <SoftwareSerial.h>
+#include <string.h>
 //#include <Adafruit_INA219.h>
 
 struct SensorData {
@@ -34,8 +35,8 @@ public:
 
 private:
     void readVictronTelemetry();
-    void parseVictronLine(const String& line);
-    float parseVictronValue(const String& valueText, bool divideBy1000) const;
+    void parseVictronLine(const char* line);
+    float parseVictronValue(const char* valueText, bool divideBy1000) const;
 
     OneWire oneWire{ONE_WIRE_PIN};
     DallasTemperature temperatureSensor{&oneWire};
