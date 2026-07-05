@@ -44,6 +44,8 @@ void App::loop()
 
     if (millis() - lastSend >= updateInterval)
     {
+        Serial.println(digitalRead(8));
+        
         lastSend = millis();
         clockService.syncIfNeeded(apiClient);  
         sendMeasurements();

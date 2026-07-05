@@ -15,6 +15,8 @@ bool SensorService::begin()
     victronSerial.listen();
 #endif
 
+    //Serial1.begin(19200);
+
     return true;
 }
 
@@ -30,7 +32,18 @@ void SensorService::readVictronTelemetry()
     String line;
     bool receivedData = false;
 
-    while (victronSerial.available())
+    bool victronAvailable = victronSerial.available();
+    Serial.println(victronAvailable);
+
+    int rc = victronSerial.begin(19200);
+    Serial.print("SoftwareSerial begin = ");
+    Serial.println(rc);
+
+    //int rc1 = Serial1.begin(19200);
+    //Serial.print("Serial1 begin = ");
+    //Serial.println(rc1);
+
+    while (victronAvailable)
     {
         receivedData = true;
         lastVictronActivityMillis = millis();
