@@ -26,6 +26,6 @@ constexpr int MATRIX_TEXT_SCROLL_SPEED = 160;
 constexpr int MATRIX_TEXT_Y = 1;
 constexpr int MATRIX_WIDTH = 12; // used for centering static text
 
-//const unsigned long API_REQUEST_INTERVAL = 2UL * 60UL * 1000UL; // 2 minutes
-const unsigned long API_REQUEST_INTERVAL = 15UL * 1000UL; // 15 seconds
+const unsigned long API_REQUEST_INTERVAL = 2UL * 60UL * 1000UL; // 2 minutes
+//const unsigned long API_REQUEST_INTERVAL = 15UL * 1000UL; // 15 seconds
 const unsigned long API_REQUEST_FAIL_WAIT_TIME = 15UL * 60UL * 1000UL; // 15 minutes
