@@ -1,3 +1,8 @@
 <Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
   <Project Path="VictronGate/VictronGate.csproj" />
+  <Project Path="VictronGateCpp/VictronGateCpp.vcxproj" />
 </Solution>
