@@ -29,7 +29,7 @@ namespace SmartHome.API
             // Use configured connection string for DbContext
             var sqliteConn = builder.Configuration.GetConnectionString("SqlLightConnection");
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(sqliteConn));
-            builder.Services.AddScoped<IBatteryStateRepo, BatteryStateRepo>();
+            builder.Services.AddScoped<IBatteryStateRepo, ChargingControllerDataRepo>();
             builder.Services.AddScoped<ILightSensorDataRepo, LightSensorDataRepo>();
             builder.Services.AddScoped<ITemperatureDataRepo, TemperatureDataRepo>();
             builder.Services.AddScoped<ILogsRepo, LogsRepo>();

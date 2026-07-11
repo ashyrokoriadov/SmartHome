@@ -6,7 +6,7 @@ namespace SmartHome.API
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<ElectricalSensor> BatteryStates { get; set; }
+        public DbSet<ChargingControllerData> BatteryStates { get; set; }
 
         public DbSet<LightSensorData> LightSensorData { get; set; }
 

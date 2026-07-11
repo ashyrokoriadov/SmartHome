@@ -20,7 +20,7 @@ namespace SmartHome.API.Shared.Repos
             InfluxClient = influxClient;
         }
 
-        public async Task AddAsync(T entry)
+        public virtual async Task AddAsync(T entry)
         {
             if (entry == null)
             {
@@ -32,7 +32,7 @@ namespace SmartHome.API.Shared.Repos
             await WriteToInfluxAsync(entry);
         }
 
-        public async Task AddRangeAsync(IEnumerable<T> entries)
+        public virtual async Task AddRangeAsync(IEnumerable<T> entries)
         {
             if (entries == null || !entries.Any())
             {
