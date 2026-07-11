@@ -145,87 +145,94 @@ class VictronSerialReader {
 public:
 	ParsedValue ReadByte(const std::string& input) {
 		buffer.push_back(input);
+
 		if (input == "D") {
-			auto pr = parser.ParseBytes(buffer);
+			auto parsingResult = parser.ParseBytes(buffer);
 			buffer.clear();
-			return AdjustValue(pr);
+
+			return AdjustValue(parsingResult);
 		}
+
 		return ParsedValue::Empty();
 	}
 
+	// original C# AdjustValue port
 private:
 	std::vector<std::string> buffer;
 	VictronDataParser parser;
 
-	ParsedValue AdjustValue(const std::pair<std::string, std::string>& pr) {
-		const auto& key = pr.first;
-		const auto& val = pr.second;
+	ParsedValue AdjustValue(const std::pair<std::string, std::string>& parsingResult) {
+		const auto &key = parsingResult.first;
+		const auto &value = parsingResult.second;
+
 		try {
 			if (key == "Voltage") {
-				double v = std::stod(val);
-				std::ostringstream ss; ss << (v / 1000.0);
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) {
+					double voltage = std::stod(value);
+					std::ostringstream ss; ss << (voltage / 1000.0);
+					return ParsedValue(key, ss.str());
+				}
 			}
 			if (key == "Current") {
-				double c = std::stod(val);
-				std::ostringstream ss; ss << (c / 100.0);
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) {
+					double current = std::stod(value);
+					std::ostringstream ss; ss << (current / 100.0);
+					return ParsedValue(key, ss.str());
+				}
 			}
 			if (key == "PanelVoltage") {
-				double pv = std::stod(val);
-				std::ostringstream ss; ss << (pv / 1000.0);
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) {
+					double panelVoltage = std::stod(value);
+					std::ostringstream ss; ss << (panelVoltage / 1000.0);
+					return ParsedValue(key, ss.str());
+				}
 			}
 			if (key == "PanelPower") {
-				double pp = std::stod(val);
-				std::ostringstream ss; ss << pp;
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) return ParsedValue(key, value);
 			}
 			if (key == "ChargerState") {
-				int s = std::stoi(val);
-				std::string stateName = ChargerStateName(s);
-				return ParsedValue(key, stateName);
+				if (!value.empty()) {
+					int csInt = std::stoi(value);
+					switch (csInt) {
+						case 0: return ParsedValue(key, "Bulk");
+						case 1: return ParsedValue(key, "Absorption");
+						case 2: return ParsedValue(key, "Float");
+						default: return ParsedValue::Empty();
+					}
+				}
 			}
 			if (key == "Error") {
-				int e = std::stoi(val);
-				return ParsedValue(key, std::to_string(e));
+				if (!value.empty()) return ParsedValue(key, value);
 			}
 			if (key == "H19") {
-				double h = std::stod(val);
-				std::ostringstream ss; ss << (h / 100.0);
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) {
+					double h19 = std::stod(value);
+					std::ostringstream ss; ss << (h19 / 100.0);
+					return ParsedValue(key, ss.str());
+				}
 			}
 			if (key == "ProductId" || key == "SerialNumber" || key == "Unknown") {
-				return ParsedValue(key, val);
+				return ParsedValue(key, value);
 			}
 			if (key == "GainedEnergy") {
-				double g = std::stod(val);
-				std::ostringstream ss; ss << (g / 100.0);
-				return ParsedValue(key, ss.str());
+				if (!value.empty()) {
+					double gainedEnergy = std::stod(value);
+					std::ostringstream ss; ss << (gainedEnergy / 100.0);
+					return ParsedValue(key, ss.str());
+				}
 			}
 		} catch (...) {
-			// fall through to empty
+			// fall through
 		}
-		return ParsedValue::Empty();
-	}
 
-	std::string ChargerStateName(int v) {
-		switch (v) {
-			case 0: return "Bulk";
-			case 1: return "Absorption";
-			case 2: return "Float";
-			case 3: return "Reserve3";
-			case 4: return "Reserve4";
-			default: return std::to_string(v);
-		}
+		return ParsedValue::Empty();
 	}
 };
 
 int main() {
 	VictronSerialReader reader;
 
-	std::string wholeInput = R"(D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 37 30 D A 49 9 30 D A 56 50 56 9 31 33 32 32 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32 D A 43 68 65 63 6B 73 75 6D 9 4F D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 38 30 D A 49 9 30 D A 56 50 56 9 31 33 32 36 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32 D A 43 68 65 63 6B 73 75 6D 9 4A D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 38 30 D A 49 9 30 D A 56 50 56 9 31 33 32 36 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32 D A 43 68 65 63 6B 73 75 6D 9 4A D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 37 30 D A 49 9 30 D A 56 50 56 9 31 33 32 36 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32)";
-
+	std::string wholeInput = R"(D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 37 30 D A 49 9 30 D A 56 50 56 9 31 33 32 32 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32 D A 43 68 65 63 6B 73 75 6D 9 4F D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 38 30 D A 49 9 30 D A 56 50 56 9 31 33 32 36 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32 D A 43 68 65 63 6B 73 75 6D 9 4A D A 50 49 44 9 30 78 41 30 35 38 D A 46 57 9 31 35 39 D A 53 45 52 23 9 48 51 32 35 33 37 5A 45 41 47 55 D A 56 9 31 33 32 38 30 D A 49 9 30 D A 56 50 56 9 31 33 32 36 30 D A 50 50 56 9 30 D A 43 53 9 30 D A 4D 50 50 54 9 30 D A 4F 52 9 30 78 30 30 30 30 30 30 30 31 D A 45 52 52 9 30 D A 4C 4F 41 44 9 4F 4E D A 48 31 39 9 31 39 38 D A 48 32 30 9 34 D A 48 32 31 9 33 30 D A 48 32 32 9 38 D A 48 32 33 9 33 34 D A 48 53 44 53 9 33 32)";
 	std::istringstream iss(wholeInput);
 	std::vector<std::string> tokens;
 	std::string t;
@@ -245,7 +252,6 @@ int main() {
 	}
 
 	std::cout << "TRANSMISSION END." << std::endl;
-	std::cout << "Press Enter to exit..." << std::endl;
 	std::cin.get();
 	return 0;
 }
