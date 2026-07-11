@@ -7,11 +7,16 @@
 #include <ArduinoGraphics.h>
 #include <Arduino_LED_Matrix.h>
 #include "LightingService.h"
+#include "SoftwareSerial.h"
+#include "VictronParser.h"
 
 App::App(ClockService& clock)
     : clockService(clock),
       lightingService(clock)
 {}
+
+SoftwareSerial victron(VICTRON_RX_PIN, VICTRON_TX_PIN);
+VictronSerialReader victronSerialReader;
 
 void App::setup()
 {
@@ -29,6 +34,8 @@ void App::setup()
 
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
     pinMode(VICTRON_RX_PIN, INPUT);
+
+    victron.begin(19200);
 
     updateInterval = API_REQUEST_INTERVAL;
 }
@@ -49,6 +56,21 @@ void App::loop()
         lastSend = millis();
         clockService.syncIfNeeded(apiClient);  
         sendMeasurements();
+    }
+
+    while (victron.available())
+    {
+        byte b = victron.read();
+        String token = (b == 'D') ? "D" : String(b, HEX);
+        ParsedValue parsedValue = victronSerialReader.ReadByte(token);
+
+        if (!parsedValue.IsEmpty())
+        {
+            //Serial.print("Victron ");
+            //Serial.print(parsedValue.Name);
+            //Serial.print(": ");
+            //Serial.println(parsedValue.Value);
+        }
     }
 }
 
@@ -149,23 +171,11 @@ void App::sendMeasurements()
 
     // Battery payload
     {
-        StaticJsonDocument<512> doc;
-        char jsonBuffer[512];
-
-        doc["correlationId"] = correlationId;
-        doc["timestamp"] = timestamp;
-        doc["location"] = LOCATION;
-        doc["Voltage"] = data.voltage;
-        doc["Current"] = data.current;
-        doc["PanelVoltage"] = data.panelVoltage;
-        doc["PanelPower"] = data.panelPower;
-        doc["ChargerState"] = data.chargerState;
-        doc["Error"] = data.error;
-        doc["GainedEnergyToday"] = data.gainedEnergyToday;
-
-        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
-
-        electricalPostResult = apiClient.post("/Battery/Add", jsonBuffer);
+        //StaticJsonDocument<512> doc;
+        //char jsonBuffer[512]; 
+        //serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+        //electricalPostResult = apiClient.post("/Battery/Add", jsonBuffer);
+        electricalPostResult = true;
     }
 
     if (temperaturePostResult & lightPostResult & electricalPostResult)
