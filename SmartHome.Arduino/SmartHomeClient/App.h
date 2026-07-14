@@ -5,6 +5,7 @@
 #include "SensorService.h"
 #include "MatrixDisplay.h"
 #include "LightingService.h"
+#include "VictronParser.h"
 
 class App {
 public:
@@ -26,4 +27,5 @@ private:
 
     void connectWiFi();
     void sendMeasurements();
+    void postParsedMeasurement(const ParsedValue& measurement);
 };

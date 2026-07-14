@@ -66,10 +66,12 @@ void App::loop()
 
         if (!parsedValue.IsEmpty())
         {
-            //Serial.print("Victron ");
-            //Serial.print(parsedValue.Name);
-            //Serial.print(": ");
-            //Serial.println(parsedValue.Value);
+            Serial.print("Victron ");
+            Serial.print(parsedValue.Name);
+            Serial.print(": ");
+            Serial.println(parsedValue.Value);
+
+            postParsedMeasurement(parsedValue);
         }
     }
 }
@@ -100,6 +102,38 @@ void App::connectWiFi()
     Serial.println("WiFi connected");
 
     display.printScroll("WiFi OK");
+}
+
+void App::postParsedMeasurement(const ParsedValue& measurement)
+{
+    char timestamp[32];
+    clockService.formatUtc(timestamp, sizeof(timestamp));
+
+    char correlationId[128] = "";
+    if (!apiClient.get("/MetaData/CorrelationId", correlationId, sizeof(correlationId)))
+    {
+        Serial.println("Failed to fetch correlation id for parsed measurement");
+        return;
+    }
+
+    StaticJsonDocument<512> doc;
+    char jsonBuffer[512];
+
+    doc["correlationId"] = correlationId;
+    doc["timestamp"] = timestamp;
+    doc["location"] = LOCATION;
+    doc["name"] = measurement.Name;
+    doc["value"] = measurement.Value;
+    doc["dataType"] = "System.Decimal";
+
+    serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+
+    bool result = apiClient.post("/BatteryData/Add", jsonBuffer);
+    if (!result)
+    {
+        Serial.print("Failed to post measurement ");
+        Serial.println(measurement.Name);
+    }
 }
 
 void App::sendMeasurements()
