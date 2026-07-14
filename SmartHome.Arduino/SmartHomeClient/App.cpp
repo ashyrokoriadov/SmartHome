@@ -25,7 +25,7 @@ void App::setup()
     Serial.begin(115200);
     while (!Serial && millis() - start < 3000);
     
-    display.begin(); 
+    //display.begin(); 
 
     connectWiFi();
 
@@ -58,20 +58,29 @@ void App::loop()
         sendMeasurements();
     }
 
+    int counter = 0;
+
     while (victron.available())
     {
         byte b = victron.read();
         String token = (b == 'D') ? "D" : String(b, HEX);
         ParsedValue parsedValue = victronSerialReader.ReadByte(token);
 
-        if (!parsedValue.IsEmpty())
+        if (!parsedValue.IsEmpty() && parsedValue.Name != "Unknown")
         {
-            Serial.print("Victron ");
-            Serial.print(parsedValue.Name);
-            Serial.print(": ");
-            Serial.println(parsedValue.Value);
+            //Serial.print("Victron ");
+            //Serial.print(parsedValue.Name);
+            //Serial.print(": ");
+            //Serial.println(parsedValue.Value);
+
+            counter++;
 
             postParsedMeasurement(parsedValue);
+        }
+
+        if (counter == 8)
+        {
+            break;
         }
     }
 }

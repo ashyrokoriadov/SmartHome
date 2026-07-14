@@ -13,7 +13,7 @@ namespace SmartHome.Shared.Models
         public override string ToString()
         {
             return $"{nameof(CorrelationId)}: {CorrelationId}, {nameof(Timestamp)}: {Timestamp:yyyy-MM-dd HH:mm:ss}," +
-                $", {nameof(Name)}: {Name}, {nameof(Value)}: {Value}, {nameof(DataType)}: {DataType}.";
+                $" {nameof(Name)}: {Name}, {nameof(Value)}: {Value}, {nameof(DataType)}: {DataType}.";
         }
     }
 }

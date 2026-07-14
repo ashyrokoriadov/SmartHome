@@ -157,7 +157,7 @@ public:
     if (bufLen < MAX_BUFFER_TOKENS) {
       buffer[bufLen++] = input;
     }
-    if (input == "D") {
+    if (input == "d") {
       String key, val;
       parser.ParseBytes(buffer, bufLen, key, val);
       bufLen = 0;
