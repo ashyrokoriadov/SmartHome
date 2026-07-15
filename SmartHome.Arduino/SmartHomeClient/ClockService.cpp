@@ -11,6 +11,8 @@ bool ClockService::begin()
         Serial.println("RTC not found.");
         return false;
     }
+
+    Serial.println("RTC found.");
     return true;
 }
 

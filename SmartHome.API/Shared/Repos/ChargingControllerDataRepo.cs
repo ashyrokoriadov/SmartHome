@@ -21,7 +21,7 @@ namespace SmartHome.API.Shared.Repos
         {
             ArgumentNullException.ThrowIfNull(entry);
 
-            SetDataType(entry);
+            _measurementName = entry.MeasurementType ?? MeasurementTypes.Electricity;
 
             if (entry.Name == "Unknown" || string.IsNullOrEmpty(entry.Name))
             {
@@ -47,18 +47,17 @@ namespace SmartHome.API.Shared.Repos
                     throw new ArgumentException("One of the items in the collection is null.", nameof(entries));
                 }
 
-                SetDataType(entry);
-
                 if (entry.Name == "Unknown" || string.IsNullOrEmpty(entry.Name))
                 {
                     continue;
-                }
+                }                
 
                 Context.Add(entry);
             }
             await Context.SaveChangesAsync();
             foreach (var entry in entries)
             {
+                _measurementName = entry.MeasurementType ?? MeasurementTypes.Electricity;
                 await WriteToInfluxAsync(entry);
             }
         }
@@ -131,57 +130,6 @@ namespace SmartHome.API.Shared.Repos
                     { "Name", entry.Name },
                     { "Value", entry.Value }
                 };
-            }
-        }
-
-        private void SetDataType(ChargingControllerData entry)
-        {
-            switch (entry.Name)
-            {
-                case "Voltage":
-                    _measurementName = MeasurementTypes.Voltage;
-                    entry.DataType = "Decimal";
-                    break;
-                case "PanelVoltage":
-                    _measurementName = MeasurementTypes.PanelVoltage;
-                    entry.DataType = "Decimal";
-                    break;
-                case "PanelPower":
-                    _measurementName = MeasurementTypes.PanelPower;
-                    entry.DataType = "Decimal";
-                    break;
-                case "Current":
-                    _measurementName = MeasurementTypes.Current;
-                    entry.DataType = "Decimal";
-                    break;
-                case "GainedEnergy":
-                    _measurementName = MeasurementTypes.GainedEnergy;
-                    entry.DataType = "Decimal";
-                    break;
-                case "H19":
-                    _measurementName = MeasurementTypes.H19;
-                    entry.DataType = "Decimal";
-                    break; 
-                case "ChargerState":
-                    _measurementName = MeasurementTypes.ChargerState;
-                    entry.DataType = "ChargerState";                 
-                    break;
-                case "Error":
-                    _measurementName = MeasurementTypes.Error;
-                    entry.DataType = "String";
-                    break;
-                case "ProductId":
-                    _measurementName = MeasurementTypes.ProductId;
-                    entry.DataType = "String";
-                    break;
-                case "SerialNumber":
-                    _measurementName = MeasurementTypes.SerialNumber;
-                    entry.DataType = "String";
-                    break;
-                case "Unknown":
-                    _measurementName = MeasurementTypes.Electricity;
-                    entry.DataType = "String";
-                    break;               
             }
         }
     }

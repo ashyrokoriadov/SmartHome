@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartHome.API.Options;
 using SmartHome.API.Shared;
 using SmartHome.API.Shared.Influx;
+using SmartHome.API.Shared.Influx.Interfaces;
 using SmartHome.API.Shared.Interfaces;
 using SmartHome.API.Shared.Repos;
 using SmartHome.API.Shared.Repos.Interfaces;
@@ -35,6 +36,7 @@ namespace SmartHome.API
             builder.Services.AddScoped<ILogsRepo, LogsRepo>();
             builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
             builder.Services.AddScoped<IInfluxClient, InfluxClient>();
+            builder.Services.AddScoped<IDataTypeSetter, DataTypeSetter>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(

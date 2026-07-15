@@ -109,7 +109,7 @@ void App::readVictronMeasurements()
             postParsedMeasurement(parsedValue);
         }
 
-        if (counter == 4)
+        if (counter == 5)
         {
             break;
         }

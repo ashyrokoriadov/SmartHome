@@ -27,14 +27,14 @@ namespace SmartHome.API.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task Add([FromBody] T entity)
+        public virtual async Task Add([FromBody] T entity)
         {
             Logger.LogInformation("Adding new data: {Entity}", entity);
             await Repo.AddAsync(entity);
         }
 
         [HttpPost("AddRange")]
-        public async Task AddRange([FromBody] IEnumerable<T> entities)
+        public virtual async Task AddRange([FromBody] IEnumerable<T> entities)
         {
             Logger.LogInformation("Adding new data: {Entities}", entities);
             await Repo.AddRangeAsync(entities);

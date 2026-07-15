@@ -1,4 +1,5 @@
 ﻿using SmartHome.API.Shared.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartHome.Shared.Models
 {
@@ -10,10 +11,13 @@ namespace SmartHome.Shared.Models
 
         public string DataType { get; set; } = string.Empty;
 
+        [NotMapped]
+        public string MeasurementType { get; set; } = string.Empty;
+
         public override string ToString()
         {
             return $"{nameof(CorrelationId)}: {CorrelationId}, {nameof(Timestamp)}: {Timestamp:yyyy-MM-dd HH:mm:ss}," +
-                $" {nameof(Name)}: {Name}, {nameof(Value)}: {Value}, {nameof(DataType)}: {DataType}.";
+                $" {nameof(Name)}: {Name}, {nameof(Value)}: {Value}, {nameof(DataType)}: {DataType}, {nameof(MeasurementType)}: {MeasurementType}.";
         }
     }
 }
