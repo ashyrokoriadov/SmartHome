@@ -34,7 +34,7 @@ int SensorService::readLightDigital()
 SensorData SensorService::readAll()
 {
     SensorData data;
-
+    data.temperature = readTemperature();
     data.lightAnalog = readLightAnalog();
     data.lightDigital = readLightDigital();
 

@@ -26,10 +26,7 @@ public:
     int readLightAnalog();
     int readLightDigital();
 
-private:
-    
+private:    
     OneWire oneWire{ONE_WIRE_PIN};
     DallasTemperature temperatureSensor{&oneWire};   
-
-    //Adafruit_INA219 ina219;
 };
