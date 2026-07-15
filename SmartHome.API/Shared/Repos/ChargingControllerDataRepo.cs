@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartHome.API.Shared.Constants;
 using SmartHome.API.Shared.Interfaces;
+using SmartHome.API.Shared.Models;
 using SmartHome.Shared.Models;
 
 using SmartHome.Shared.Repos.Interfaces;
+using System.Globalization;
 namespace SmartHome.API.Shared.Repos
 {
     public class ChargingControllerDataRepo : DataRepo<ChargingControllerData>, IBatteryStateRepo
@@ -13,7 +15,7 @@ namespace SmartHome.API.Shared.Repos
         private string _measurementName { get; set; } = MeasurementTypes.Electricity;
         protected override string MeasurementName => _measurementName;
 
-        protected override string BucketName => InfluxBuckets.Electricity;
+        protected override string BucketName => InfluxBuckets.Victron;
 
         public override async Task AddAsync(ChargingControllerData entry)
         {
@@ -81,11 +83,55 @@ namespace SmartHome.API.Shared.Repos
 
         protected override Dictionary<string, object> GetValuesFromEntry(ChargingControllerData entry)
         {
-            return new Dictionary<string, object>
+            switch (entry.DataType)
             {
-                { "Name", entry.Name },
-                { "Value", entry.Value }
-            };
+                case "Decimal":
+                    if (string.IsNullOrWhiteSpace(entry.Value))
+                    {
+                        entry.Value = "0";
+                    }
+
+                    if (decimal.TryParse(entry.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal decimalValue))
+                    {
+                        return new Dictionary<string, object>
+                        {
+                            { "Name", entry.Name },
+                            { "Value", decimalValue }
+                        };
+                    }
+                    else
+                    {
+                        return new Dictionary<string, object>
+                        {
+                            { "Name", entry.Name },
+                            { "Value", 0M }
+                        };
+                    }
+                case "ChargerState":
+                    if (Enum.TryParse(entry.Value, out ChargerState state))
+                    {
+                        return new Dictionary<string, object>
+                        {
+                            { "Name", entry.Name },
+                            { "Value", entry.Value }
+                        };
+                    }
+                    else
+                    {
+                        return new Dictionary<string, object>
+                        {
+                            { "Name", entry.Name },
+                            { "Value", ChargerState.Reserve3 }
+                        };
+                    }
+                case "String":
+                default:
+                    return new Dictionary<string, object>
+                {
+                    { "Name", entry.Name },
+                    { "Value", entry.Value }
+                };
+            }
         }
 
         private void SetDataType(ChargingControllerData entry)

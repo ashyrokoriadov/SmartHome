@@ -5,5 +5,6 @@
         public const string Temperature = "temperature";
         public const string Luminosity = "luminosity";
         public const string Electricity = "electricity";
+        public const string Victron = "victron";
     }
 }
