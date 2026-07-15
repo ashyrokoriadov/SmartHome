@@ -56,32 +56,7 @@ void App::loop()
         lastSend = millis();
         clockService.syncIfNeeded(apiClient);  
         sendMeasurements();
-    }
-
-    int counter = 0;
-
-    while (victron.available())
-    {
-        byte b = victron.read();
-        String token = (b == 'D') ? "D" : String(b, HEX);
-        ParsedValue parsedValue = victronSerialReader.ReadByte(token);
-
-        if (!parsedValue.IsEmpty() && parsedValue.Name != "Unknown")
-        {
-            //Serial.print("Victron ");
-            //Serial.print(parsedValue.Name);
-            //Serial.print(": ");
-            //Serial.println(parsedValue.Value);
-
-            counter++;
-
-            postParsedMeasurement(parsedValue);
-        }
-
-        if (counter == 8)
-        {
-            break;
-        }
+        readVictronMeasurements();
     }
 }
 
@@ -111,6 +86,34 @@ void App::connectWiFi()
     Serial.println("WiFi connected");
 
     display.printScroll("WiFi OK");
+}
+
+void App::readVictronMeasurements()
+{
+    int counter = 0;
+
+    while (victron.available())
+    {
+        byte b = victron.read();
+        String token = (b == 'D') ? "D" : String(b, HEX);
+        ParsedValue parsedValue = victronSerialReader.ReadByte(token);
+
+        if (!parsedValue.IsEmpty() 
+            && parsedValue.Name != "Unknown"
+            && parsedValue.Name != "ChargerState"
+            && parsedValue.Name != "Error"
+            && parsedValue.Name != "ProductId"
+            && parsedValue.Name != "SerialNumber")
+        {
+            counter++;
+            postParsedMeasurement(parsedValue);
+        }
+
+        if (counter == 4)
+        {
+            break;
+        }
+    }
 }
 
 void App::postParsedMeasurement(const ParsedValue& measurement)
@@ -179,7 +182,6 @@ void App::sendMeasurements()
 
     bool temperaturePostResult = false;
     bool lightPostResult = false;
-    bool electricalPostResult = false;
 
     // Temperature payload
     {
@@ -212,16 +214,7 @@ void App::sendMeasurements()
         lightPostResult = apiClient.post("/LightSensor/Add", jsonBuffer);
     }
 
-    // Battery payload
-    {
-        //StaticJsonDocument<512> doc;
-        //char jsonBuffer[512]; 
-        //serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
-        //electricalPostResult = apiClient.post("/Battery/Add", jsonBuffer);
-        electricalPostResult = true;
-    }
-
-    if (temperaturePostResult & lightPostResult & electricalPostResult)
+    if (temperaturePostResult & lightPostResult)
     {
         display.printStatic("OK");
     }
@@ -237,11 +230,6 @@ void App::sendMeasurements()
         if (!lightPostResult)
         {
             errorMessage += "LF ";
-        }
-
-        if (!electricalPostResult)
-        {
-            errorMessage += "EF ";
         }
 
         errorMessage.trim();

@@ -27,5 +27,6 @@ private:
 
     void connectWiFi();
     void sendMeasurements();
+    void readVictronMeasurements();
     void postParsedMeasurement(const ParsedValue& measurement);
 };
