@@ -7,7 +7,6 @@
 #include <ArduinoGraphics.h>
 #include <Arduino_LED_Matrix.h>
 #include "LightingService.h"
-#include "SoftwareSerial.h"
 #include "VictronParser.h"
 
 App::App(ClockService& clock)
@@ -15,7 +14,7 @@ App::App(ClockService& clock)
       lightingService(clock)
 {}
 
-SoftwareSerial victron(VICTRON_RX_PIN, VICTRON_TX_PIN);
+#define victron Serial1
 VictronSerialReader victronSerialReader;
 
 void App::setup()
@@ -35,7 +34,7 @@ void App::setup()
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
     pinMode(VICTRON_RX_PIN, INPUT);
 
-    victron.begin(19200);
+    Serial1.begin(19200);
 
     updateInterval = API_REQUEST_INTERVAL;
 }
@@ -92,9 +91,9 @@ void App::readVictronMeasurements()
 {
     int counter = 0;
 
-    while (victron.available())
+    while (Serial1.available())
     {
-        byte b = victron.read();
+        byte b = Serial1.read();
         String token = (b == 'D') ? "D" : String(b, HEX);
         ParsedValue parsedValue = victronSerialReader.ReadByte(token);
 
