@@ -19,21 +19,35 @@ bool SensorService::begin()
 
     pinMode(LIGHT_DIGITAL_PIN, INPUT);
 
+    int airSensorCounter = 0;
+
     while(CCS811.begin() != 0){
         Serial.println("failed to init CCS811 chip, please check if the chip connection is fine");
-        delay(1000);
+        if (airSensorCounter == 4)
+        {
+            break;
+        }
+        delay(1000);    
+        airSensorCounter++;    
     }
     Serial.println("Chip CCS811 was initialized successfully.");
+    airSensorCounter = 0;
 
     bme.reset();
     Serial.println("bme read data test");
     while(bme.begin() != BME::eStatusOK) {
         Serial.println("BME initialization failed.");
         printLastOperateStatus(bme.lastOperateStatus);
+        if (airSensorCounter == 4)
+        {
+            break;
+        }
         delay(2000);
+        airSensorCounter++;    
     }
     Serial.println("BME was initialized successfully.");
     delay(100);
+    airSensorCounter = 0;
 
     return true;
 }
