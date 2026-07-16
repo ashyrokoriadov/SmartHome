@@ -89,24 +89,25 @@ AirPolutionData SensorService::readAirPolutionData()
     AirPolutionData data;
 
     uint8_t Status = ENS160.getENS160Status();
-    Serial.print("Sensor operating status : ");
-    Serial.println(Status);
+    //Serial.print("Sensor operating status : ");
+    //Serial.println(Status);
 
     uint8_t AQI = ENS160.getAQI();
-    Serial.print("Air quality index : ");
-    Serial.println(AQI);
+    //Serial.print("Air quality index : ");
+    //Serial.println(AQI);
 
     uint16_t TVOC = ENS160.getTVOC();
-    Serial.print("Concentration of total volatile organic compounds : ");
-    Serial.print(TVOC);
-    Serial.println(" ppb");
+    //Serial.print("Concentration of total volatile organic compounds : ");
+    //Serial.print(TVOC);
+    //Serial.println(" ppb");
 
     uint16_t ECO2 = ENS160.getECO2();
-    Serial.print("Carbon dioxide equivalent concentration : ");
-    Serial.print(ECO2);
-    Serial.println(" ppm");
-    Serial.println();
+    //Serial.print("Carbon dioxide equivalent concentration : ");
+    //Serial.print(ECO2);
+    //Serial.println(" ppm");
+    //Serial.println();
     
+    data.status = Status;
     data.AQI = AQI;
     data.TVOC = TVOC;
     data.ECO2 = ECO2;
@@ -134,6 +135,7 @@ SensorData SensorService::readAll()
     data.ECO2 = airPolutionData.ECO2;
     data.TVOC = airPolutionData.TVOC;
     data.AQI = airPolutionData.AQI;
+    data.status = airPolutionData.status;
 
     AirQualityData airQualityData = readAirQualityData();
     data.temperatureExternal = airQualityData.temperature;

@@ -24,7 +24,7 @@ void App::setup()
     Serial.begin(115200);
     while (!Serial && millis() - start < 3000);
     
-    //display.begin(); 
+    display.begin(); 
 
     connectWiFi();
 
@@ -207,6 +207,7 @@ void App::sendMeasurements()
         doc["correlationId"] = correlationId;
         doc["timestamp"] = timestamp;
         doc["location"] = LOCATION;
+        doc["status"] = data.status;
         doc["ECO2"] = data.ECO2;
         doc["TVOC"] = data.TVOC;
         doc["AQI"] = data.AQI;

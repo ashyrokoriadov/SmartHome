@@ -18,6 +18,7 @@ struct SensorData {
     float ECO2;
     float TVOC;
     float AQI;
+    int status;
 
     float temperatureExternal;
     float pressure;
@@ -32,6 +33,7 @@ struct AirPolutionData {
     float ECO2;
     float TVOC;
     float AQI;
+    int status;
 };
 
 struct AirQualityData {
