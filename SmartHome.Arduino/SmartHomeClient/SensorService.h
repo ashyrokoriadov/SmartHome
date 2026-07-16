@@ -15,8 +15,9 @@ extern BME bme;
 struct SensorData {
     float temperature;
 
-    float CO2;
+    float ECO2;
     float TVOC;
+    float AQI;
 
     float temperatureExternal;
     float pressure;
@@ -27,12 +28,13 @@ struct SensorData {
     int lightDigital;
 };
 
-struct AirSensorData {
-    float CO2;
+struct AirPolutionData {
+    float ECO2;
     float TVOC;
+    float AQI;
 };
 
-struct AirParametersData {
+struct AirQualityData {
     float temperature;
     float pressure;
     float altitude;
@@ -45,8 +47,8 @@ public:
 
     void printLastOperateStatus(BME::eStatus_t eStatus);
 
-    AirSensorData readAirSensorData();
-    AirParametersData readAirParameters();
+    AirPolutionData readAirPolutionData();
+    AirQualityData readAirQualityData();
 
     SensorData readAll();
 

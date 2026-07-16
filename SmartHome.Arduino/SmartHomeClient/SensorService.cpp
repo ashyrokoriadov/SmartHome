@@ -4,12 +4,12 @@
 
 #include "Config.h"
 #include "SensorService.h"
-#include "DFRobot_CCS811.h"
+#include "DFRobot_ENS160.h"
 #include "DFRobot_BME280.h"
 #include "Wire.h"
 
 BME bme(&Wire, 0x76);
-DFRobot_CCS811 CCS811;
+DFRobot_ENS160_I2C ENS160(&Wire, 0x53);
 
 #define SEA_LEVEL_PRESSURE    1015.0f
 
@@ -21,8 +21,8 @@ bool SensorService::begin()
 
     int airSensorCounter = 0;
 
-    while(CCS811.begin() != 0){
-        Serial.println("failed to init CCS811 chip, please check if the chip connection is fine");
+    while( ENS160.begin() != NO_ERR ){
+        Serial.println("Communication with device ENS160 failed, please check connection.");
         if (airSensorCounter == 4)
         {
             break;
@@ -30,11 +30,13 @@ bool SensorService::begin()
         delay(1000);    
         airSensorCounter++;    
     }
-    Serial.println("Chip CCS811 was initialized successfully.");
+    Serial.println("Device ENS160 was initialized successfully.");
+    ENS160.setPWRMode(ENS160_STANDARD_MODE);
+
     airSensorCounter = 0;
 
     bme.reset();
-    Serial.println("bme read data test");
+    Serial.println("BME read test data.");
     while(bme.begin() != BME::eStatusOK) {
         Serial.println("BME initialization failed.");
         printLastOperateStatus(bme.lastOperateStatus);
@@ -48,6 +50,8 @@ bool SensorService::begin()
     Serial.println("BME was initialized successfully.");
     delay(100);
     airSensorCounter = 0;
+
+    ENS160.setTempAndHum(bme.getTemperature(), bme.getHumidity());
 
     return true;
 }
@@ -80,32 +84,39 @@ int SensorService::readLightDigital()
     return digitalRead(LIGHT_DIGITAL_PIN);
 }
 
-AirSensorData SensorService::readAirSensorData()
+AirPolutionData SensorService::readAirPolutionData()
 {
-    AirSensorData data;
+    AirPolutionData data;
 
-    if(CCS811.checkDataReady() == true){
+    uint8_t Status = ENS160.getENS160Status();
+    Serial.print("Sensor operating status : ");
+    Serial.println(Status);
 
-        data.CO2 = CCS811.getCO2PPM();
-        data.TVOC = CCS811.getTVOCPPB();
+    uint8_t AQI = ENS160.getAQI();
+    Serial.print("Air quality index : ");
+    Serial.println(AQI);
 
-        Serial.println(CCS811.readBaseLine(), HEX);
-        Serial.print("CO2: ");
-        Serial.println(data.CO2);
-        Serial.print("ppm, TVOC: ");
-        Serial.print(data.TVOC);
-        Serial.println("ppb");       
-        
-    } else {
-        Serial.println("Data is not ready!");
-    }
+    uint16_t TVOC = ENS160.getTVOC();
+    Serial.print("Concentration of total volatile organic compounds : ");
+    Serial.print(TVOC);
+    Serial.println(" ppb");
+
+    uint16_t ECO2 = ENS160.getECO2();
+    Serial.print("Carbon dioxide equivalent concentration : ");
+    Serial.print(ECO2);
+    Serial.println(" ppm");
+    Serial.println();
+    
+    data.AQI = AQI;
+    data.TVOC = TVOC;
+    data.ECO2 = ECO2;
 
     return data;
 }
 
-AirParametersData SensorService::readAirParameters()
+AirQualityData SensorService::readAirQualityData()
 {
-    AirParametersData data;
+    AirQualityData data;
 
     data.temperature = bme.getTemperature();
     data.pressure = bme.getPressure();
@@ -119,15 +130,16 @@ SensorData SensorService::readAll()
 {
     SensorData data;
     
-    AirSensorData airSensorData = readAirSensorData();
-    data.CO2 = airSensorData.CO2;
-    data.TVOC = airSensorData.TVOC;
+    AirPolutionData airPolutionData = readAirPolutionData();
+    data.ECO2 = airPolutionData.ECO2;
+    data.TVOC = airPolutionData.TVOC;
+    data.AQI = airPolutionData.AQI;
 
-    AirParametersData airParametersData = readAirParameters();
-    data.temperatureExternal = airParametersData.temperature;
-    data.pressure = airParametersData.pressure;
-    data.altitude = airParametersData.altitude;
-    data.humidity = airParametersData.humidity;
+    AirQualityData airQualityData = readAirQualityData();
+    data.temperatureExternal = airQualityData.temperature;
+    data.pressure = airQualityData.pressure;
+    data.altitude = airQualityData.altitude;
+    data.humidity = airQualityData.humidity;
 
     data.temperature = readTemperature();
     data.lightAnalog = readLightAnalog();

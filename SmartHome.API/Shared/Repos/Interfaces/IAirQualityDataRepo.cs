@@ -3,7 +3,7 @@ using SmartHome.Shared.Models;
 
 namespace SmartHome.Shared.Repos.Interfaces
 {
-    public interface ITemperatureDataRepo : IRepo<TemperatureData>
+    public interface IAirQualityDataRepoRepo : IRepo<AirQualityData>
     {
     }
 }

@@ -32,7 +32,8 @@ namespace SmartHome.API
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(sqliteConn));
             builder.Services.AddScoped<IBatteryStateRepo, ChargingControllerDataRepo>();
             builder.Services.AddScoped<ILightSensorDataRepo, LightSensorDataRepo>();
-            builder.Services.AddScoped<ITemperatureDataRepo, TemperatureDataRepo>();
+            builder.Services.AddScoped<IAirQualityDataRepoRepo, AirQualityDataRepo>();
+            builder.Services.AddScoped<IAirPolutionDataRepoRepo, AirPolutionDataRepo>();
             builder.Services.AddScoped<ILogsRepo, LogsRepo>();
             builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
             builder.Services.AddScoped<IInfluxClient, InfluxClient>();
