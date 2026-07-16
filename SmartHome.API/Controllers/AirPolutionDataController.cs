@@ -6,8 +6,8 @@ namespace SmartHome.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AirPolutionDataController : RepoController<AirQualityData>
+    public class AirPolutionDataController : RepoController<AirPolutionData>
     {
-        public AirPolutionDataController(IAirQualityDataRepoRepo repo, ILogger<AirQualityDataController> logger) : base(repo, logger) { }
+        public AirPolutionDataController(IAirPolutionDataRepoRepo repo, ILogger<AirPolutionDataController> logger) : base(repo, logger) { }
     }
 }
