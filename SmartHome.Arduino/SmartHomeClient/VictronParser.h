@@ -181,7 +181,7 @@ private:
     }
     if (key == "Current") {
       double c = val.toDouble();
-      char tmp[32]; dtostrf(c / 100.0, 0, 3, tmp);
+      char tmp[32]; dtostrf(c / 1000.0, 0, 3, tmp);
       return ParsedValue(key, String(tmp));
     }
     if (key == "PanelVoltage") {
