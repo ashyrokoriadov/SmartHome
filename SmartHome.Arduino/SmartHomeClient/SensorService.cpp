@@ -120,7 +120,10 @@ AirQualityData SensorService::readAirQualityData()
     AirQualityData data;
 
     data.temperature = bme.getTemperature();
-    data.pressure = bme.getPressure();
+
+     // BME280 returns pressure in Pa -> convert to hPa
+    data.pressure = bme.getPressure() / 100.0f;
+    
     data.altitude = bme.calAltitude(SEA_LEVEL_PRESSURE, data.pressure);
     data.humidity = bme.getHumidity();
 
