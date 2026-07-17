@@ -10,7 +10,9 @@ namespace SmartHome.API
 
         public DbSet<LightSensorData> LightSensorData { get; set; }
 
-        public DbSet<TemperatureData> TemperatureData { get; set; }
+        public DbSet<AirQualityData> AirQualityData { get; set; }
+
+        public DbSet<AirPolutionData> AirPolutionData { get; set; }
 
         public DbSet<LogEntry> Logs { get; set; }   
 

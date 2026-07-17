@@ -39,7 +39,7 @@ namespace SmartHome.API.Controllers
         {
             var conn = ctx.Database.GetDbConnection().ConnectionString;
             var batteryCount = ctx.BatteryStates.Count();
-            var tempCount = ctx.TemperatureData.Count();
+            var tempCount = ctx.AirQualityData.Count();
             var lightCount = ctx.LightSensorData.Count();
             _logger.LogInformation("Diagnostic info - Connection: {Connection}, Battery: {BatteryCount}, Temperature: {TempCount}, Light: {LightCount}", conn, batteryCount, tempCount, lightCount);
             return Ok(new { conn, batteryCount, tempCount, lightCount });

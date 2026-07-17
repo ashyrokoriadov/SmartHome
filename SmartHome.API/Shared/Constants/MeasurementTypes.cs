@@ -2,7 +2,8 @@
 {
     public static class MeasurementTypes
     {
-        public const string Temperature = "Temperature";
+        public const string AirQualityData = "AirQualityData";
+        public const string AirPolutionData = "AirPolutionData";
         public const string Luminosity = "Luminosity";
         public const string Electricity = "Electricity";
 
