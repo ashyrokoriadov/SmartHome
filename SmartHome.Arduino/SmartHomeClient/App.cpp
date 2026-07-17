@@ -24,7 +24,7 @@ void App::setup()
     Serial.begin(115200);
     while (!Serial && millis() - start < 3000);
     
-    //display.begin(); 
+    display.begin(); 
 
     connectWiFi();
 
@@ -182,7 +182,6 @@ void App::sendMeasurements()
     bool temperaturePostResult = false;
     bool lightPostResult = false;
 
-    // Temperature payload
     {
         StaticJsonDocument<512> doc;
         char jsonBuffer[512];
@@ -191,13 +190,33 @@ void App::sendMeasurements()
         doc["timestamp"] = timestamp;
         doc["location"] = LOCATION;
         doc["temperature"] = data.temperature;
+        doc["temperatureExternal"] = data.temperatureExternal;
+        doc["pressure"] = data.pressure;
+        doc["altitude"] = data.altitude;
+        doc["humidity"] = data.humidity;
 
         serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));  
         
-        temperaturePostResult = apiClient.post("/Temperature/Add", jsonBuffer);    
+        temperaturePostResult = apiClient.post("/AirQualityData/Add", jsonBuffer);    
     }
 
-    // Light sensor payload
+    {
+        StaticJsonDocument<512> doc;
+        char jsonBuffer[512];
+
+        doc["correlationId"] = correlationId;
+        doc["timestamp"] = timestamp;
+        doc["location"] = LOCATION;
+        doc["status"] = data.status;
+        doc["ECO2"] = data.ECO2;
+        doc["TVOC"] = data.TVOC;
+        doc["AQI"] = data.AQI;
+
+        serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));  
+        
+        temperaturePostResult = apiClient.post("/AirPolutionData/Add", jsonBuffer);    
+    }
+
     {
         StaticJsonDocument<512> doc;
         char jsonBuffer[512];
