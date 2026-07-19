@@ -71,9 +71,9 @@ void App::connectWiFi()
     IPAddress ip(192, 168, 1, 217);
     IPAddress gateway(192, 168, 1, 1);
     IPAddress subnet(255, 255, 255, 0);
-    IPAddress primaryDNS(8, 8, 8, 8);
+    IPAddress dns(8, 8, 8, 8);
 
-    WiFi.config(ip, gateway, subnet, primaryDNS);
+    WiFi.config(ip, dns, gateway, subnet);
 
     while (WiFi.begin(WIFI_SSID, WIFI_PASSWORD) != WL_CONNECTED)
     {
@@ -93,6 +93,9 @@ void App::connectWiFi()
 
     Serial.print("Subnet: ");
     Serial.println(WiFi.subnetMask());
+
+    Serial.print("DNS: ");
+    Serial.println(WiFi.dnsIP());
     
     display.printScroll("WiFi OK");
 }
