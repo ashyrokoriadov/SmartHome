@@ -84,6 +84,16 @@ void App::connectWiFi()
     Serial.println();
     Serial.println("WiFi connected");
 
+    
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+
+    Serial.print("Gateway: ");
+    Serial.println(WiFi.gatewayIP());
+
+    Serial.print("Subnet: ");
+    Serial.println(WiFi.subnetMask());
+    
     display.printScroll("WiFi OK");
 }
 
