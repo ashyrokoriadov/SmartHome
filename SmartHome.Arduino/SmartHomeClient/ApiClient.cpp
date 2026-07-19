@@ -35,6 +35,8 @@ bool ApiClient::get(
 
     int statusCode = 0;
     bool result = readResponse(client, response, responseSize, &statusCode);
+    Serial.print("Status code GET: ");
+    Serial.println(statusCode);
     return result && statusCode >= 200 && statusCode < 300;
 }
 
@@ -118,6 +120,8 @@ bool ApiClient::post(
     }
 
     client.stop();
+    Serial.print("Status code POST:");
+    Serial.println(statusCode);
     return statusCode >= 200 && statusCode < 300;
 }
 
