@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-constexpr char API_HOST[] = "192.168.1.94";
+constexpr char API_HOST[] = "192.168.1.150";
 constexpr uint16_t API_PORT = 5000;
 
 constexpr uint8_t ONE_WIRE_PIN = 4;

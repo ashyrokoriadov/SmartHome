@@ -6,6 +6,36 @@
 
 bool ApiClient::begin()
 {
+    WiFiClient client;
+
+    Serial.print("Connecting to API: ");
+    Serial.print(192.168.1.150);
+    Serial.print(":");
+    Serial.println(API_PORT);
+
+    if (client.connect(192.168.1.150, API_PORT))
+    {
+        Serial.println("TCP 150 OK");
+    }
+    else
+    {
+        Serial.println("TCP 150 FAILED");
+    }
+
+    Serial.print("Connecting to API: ");
+    Serial.print(192.168.1.94);
+    Serial.print(":");
+    Serial.println(API_PORT);
+
+    if (client.connect(192.168.1.94, API_PORT))
+    {
+        Serial.println("TCP 94 OK");
+    }
+    else
+    {
+        Serial.println("TCP 94 FAILED");
+    }
+
     return true;
 }
 
