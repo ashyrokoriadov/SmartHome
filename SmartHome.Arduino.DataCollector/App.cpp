@@ -116,6 +116,7 @@ void App::loop()
         connectToWifi();
     }
 
+    mqttService.loop();
     mqttService.reconnectIfNeeded();
     lightingService.update();
 

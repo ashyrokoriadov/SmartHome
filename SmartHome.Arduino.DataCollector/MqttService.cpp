@@ -49,3 +49,8 @@ void MqttService::reconnectIfNeeded()
         }
     }
 }
+
+void MqttService::loop()
+{
+    client.loop();
+}
