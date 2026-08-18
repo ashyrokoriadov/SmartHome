@@ -132,7 +132,7 @@ void App::loop()
     }
 }
 
-void App::connectToWifi()
+bool App::connectToWifi()
 {
     Serial.println("Connecting to WiFi");
     WiFi.config(IPAddress(192, 168, 1, 217), IPAddress(8, 8, 8, 8), IPAddress(255, 255, 255, 0), IPAddress(192, 168, 1, 1));
