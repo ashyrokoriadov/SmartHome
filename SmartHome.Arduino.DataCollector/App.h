@@ -24,7 +24,7 @@ private:
     unsigned long lastSensorScanMs;
     unsigned long lastVictronScanMs;
 
-    void connectToWifi();
+    bool connectToWifi();
     void publishSensorData();
     void publishVictronData();
     void publishDiscovery();

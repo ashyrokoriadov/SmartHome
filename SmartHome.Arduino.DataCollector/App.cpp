@@ -22,11 +22,19 @@ void App::setup()
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
     digitalWrite(LAMPS_CONTROL_PIN, LOW);
 
-    connectToWifi();
+    bool wifiOk = connectToWifi();
+
     clockService.begin();
     sensorService.begin();
     victronService.begin();
-    mqttService.begin(MQTT_BROKER, MQTT_PORT);
+
+    if (wifiOk) {
+        if (!mqttService.begin(MQTT_BROKER, MQTT_PORT)) {
+            Serial.println("Initial MQTT connect failed.");
+        }
+    } else {
+        Serial.println("Skipping MQTT begin because WiFi is not connected.");
+    }
     publishDiscovery();
 
     lastSensorScanMs = millis();
@@ -126,16 +134,29 @@ void App::loop()
 
 void App::connectToWifi()
 {
-    Serial.print("Connecting to WiFi");
+    Serial.println("Connecting to WiFi");
     WiFi.config(IPAddress(192, 168, 1, 217), IPAddress(8, 8, 8, 8), IPAddress(255, 255, 255, 0), IPAddress(192, 168, 1, 1));
 
+    const unsigned long WIFI_CONNECT_TIMEOUT_MS = 30000UL;
+    unsigned long start = millis();
+
+    int attempt = 0;
     while (WiFi.begin(WIFI_SSID, WIFI_PASSWORD) != WL_CONNECTED) {
+        attempt++;
         Serial.print(".");
-        delay(2000);
+        Serial.print(" attempt=");
+        Serial.print(attempt);
+        Serial.print(" status=");
+        Serial.println(WiFi.status());
+        delay(WIFI_RETRY_MS);
+        if (millis() - start >= WIFI_CONNECT_TIMEOUT_MS) {
+            Serial.println("\nWiFi connect timeout");
+            return false;
+        }
     }
 
-    Serial.println();
-    Serial.println("WiFi connected");
+    Serial.println("\nWiFi connected");
+    return true;
 }
 
 void App::publishSensorData()

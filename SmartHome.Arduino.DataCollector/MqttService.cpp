@@ -7,14 +7,15 @@ bool MqttService::begin(const char* brokerHost, uint16_t port)
     client.setClient(wifiClient);
     client.setServer(brokerHost, port);
 
-    if (client.connect("SmartHomeCollector")) {
-        connected = true;
-        Serial.println("MQTT connected.");
-        return true;
+    if (!client.connect("SmartHomeCollector")) {
+        Serial.print("MQTT connection failed, state = ");
+        Serial.println(client.state());
+        return false;
     }
 
-    Serial.println("MQTT connection failed.");
-    return false;
+    connected = true;
+    Serial.println("MQTT connected.");
+    return true;
 }
 
 bool MqttService::publishJson(const String& topic, const String& payload)
@@ -36,9 +37,13 @@ void MqttService::reconnectIfNeeded()
 {
     if (!client.connected()) {
         Serial.println("MQTT reconnect attempt.");
-        connected = client.connect("SmartHomeCollector");
-        if (!connected) {
-            Serial.println("MQTT reconnect failed.");
+        if (!client.connect("SmartHomeCollector")) {
+            Serial.print("MQTT reconnect failed, state = ");
+            Serial.println(client.state());
+            connected = false;
+        } else {
+            connected = true;
+            Serial.println("MQTT reconnected.");
         }
     }
 }
