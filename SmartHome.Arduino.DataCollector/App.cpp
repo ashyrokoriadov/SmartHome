@@ -135,7 +135,13 @@ void App::loop()
 bool App::connectToWifi()
 {
     Serial.println("Connecting to WiFi");
-    WiFi.config(IPAddress(192, 168, 1, 217), IPAddress(8, 8, 8, 8), IPAddress(255, 255, 255, 0), IPAddress(192, 168, 1, 1));
+    
+    IPAddress ip(192, 168, 1, 217);
+    IPAddress gateway(192, 168, 1, 1);
+    IPAddress subnet(255, 255, 255, 0);
+    IPAddress dns(8, 8, 8, 8);
+
+    WiFi.config(ip, dns, gateway, subnet);
 
     const unsigned long WIFI_CONNECT_TIMEOUT_MS = 30000UL;
     unsigned long start = millis();
