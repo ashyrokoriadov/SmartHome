@@ -108,6 +108,24 @@ void App::publishDiscovery()
         String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony TVOC", stateTopic.c_str(), "ppb", "volatile_organic_compounds");
         mqttService.publishJson(configTopic, payload);
     }
+
+	// Victron PV Voltage
+	{
+		const char* uniqueId = "balcony_pv_voltage";
+		String stateTopic = String(baseTopic) + "/sensor/pv_voltage";
+		String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
+		String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony PV Voltage", stateTopic.c_str(), "V", "voltage");
+		mqttService.publishJson(configTopic, payload);
+	}
+
+	// Victron Total Energy
+	{
+		const char* uniqueId = "balcony_total_energy";
+		String stateTopic = String(baseTopic) + "/sensor/total_energy";
+		String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
+		String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Total Energy", stateTopic.c_str(), "kWh", "energy");
+		mqttService.publishJson(configTopic, payload);
+	}
 }
 
 void App::loop()

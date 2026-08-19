@@ -24,6 +24,7 @@ public:
 		device["name"] = String("SmartHome Collector ") + DEVICE_LOCATION;
 		device["model"] = "SmartHome Collector";
 		device["manufacturer"] = "DIY";
+		device["value_template"] = "{{ value_json.state }}";
 
 		String json;
 		serializeJson(doc, json);
