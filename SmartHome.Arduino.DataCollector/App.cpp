@@ -75,8 +75,8 @@ void App::publishDiscovery()
 
     // Light
     {
-        const char* uniqueId = "balcony_light";
-        String stateTopic = String(baseTopic) + "/sensor/light";
+        const char* uniqueId = "balcony_light_analogue";
+        String stateTopic = String(baseTopic) + "/sensor/light-analogue";
         String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
         String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Light", stateTopic.c_str(), "lx", "illuminance");
         mqttService.publishJson(configTopic, payload);
@@ -193,17 +193,21 @@ void App::publishSensorData()
     clockService.formatUtc(timestamp, sizeof(timestamp));
 
     SensorReading temperatureReading{ "balcony_temperature", "Balcony Temperature", "/smarthome/balcony/sensor/temperature", "°C", "temperature", data.temperature };
+    SensorReading temperatureExternalReading{ "balcony_temperature_external", "Balcony External Temperature", "/smarthome/balcony/sensor/temperature-external", "°C", "temperature", data.temperatureExternal };
     SensorReading humidityReading{ "balcony_humidity", "Balcony Humidity", "/smarthome/balcony/sensor/humidity", "%", "humidity", data.humidity };
     SensorReading pressureReading{ "balcony_pressure", "Balcony Pressure", "/smarthome/balcony/sensor/pressure", "hPa", "pressure", data.pressure };
-    SensorReading lightReading{ "balcony_light", "Balcony Light", "/smarthome/balcony/sensor/light", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
+    SensorReading lightReadingAnalogue{ "balcony_light_analogue", "Balcony Light", "/smarthome/balcony/sensor/light-analogue", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
+    SensorReading lightReadingDigital { "balcony_light_digital", "Balcony Light", "/smarthome/balcony/sensor/light-digital", "lx", "illuminance", static_cast<float>(data.lightDigital) };
     SensorReading airQualityReading{ "balcony_aqi", "Balcony AQI", "/smarthome/balcony/sensor/aqi", "AQI", "aqi", data.airQualityIndex };
     SensorReading eco2Reading{ "balcony_eco2", "Balcony eCO2", "/smarthome/balcony/sensor/eco2", "ppm", "carbon_dioxide", data.eco2 };
     SensorReading tvocReading{ "balcony_tvoc", "Balcony TVOC", "/smarthome/balcony/sensor/tvoc", "ppb", "volatile_organic_compounds", data.tvoc };
 
     mqttService.publishJson(String(baseTopic) + "/sensor/temperature", HomeAssistantPayloadBuilder::build(temperatureReading));
+    mqttService.publishJson(String(baseTopic) + "/sensor/temperature-external", HomeAssistantPayloadBuilder::build(temperatureExternalReading));
     mqttService.publishJson(String(baseTopic) + "/sensor/humidity", HomeAssistantPayloadBuilder::build(humidityReading));
     mqttService.publishJson(String(baseTopic) + "/sensor/pressure", HomeAssistantPayloadBuilder::build(pressureReading));
-    mqttService.publishJson(String(baseTopic) + "/sensor/light", HomeAssistantPayloadBuilder::build(lightReading));
+    mqttService.publishJson(String(baseTopic) + "/sensor/light-analogue", HomeAssistantPayloadBuilder::build(lightReadingAnalogue));
+    mqttService.publishJson(String(baseTopic) + "/sensor/light-digital", HomeAssistantPayloadBuilder::build(lightReadingDigital));
     mqttService.publishJson(String(baseTopic) + "/sensor/aqi", HomeAssistantPayloadBuilder::build(airQualityReading));
     mqttService.publishJson(String(baseTopic) + "/sensor/eco2", HomeAssistantPayloadBuilder::build(eco2Reading));
     mqttService.publishJson(String(baseTopic) + "/sensor/tvoc", HomeAssistantPayloadBuilder::build(tvocReading));
@@ -217,13 +221,9 @@ void App::publishVictronData()
     const float totalEnergy = victronService.totalEnergy();
     const char* baseTopic = MQTT_BASE_TOPIC;
 
-    if (pvVoltage > 0.0f) {
-        SensorReading pvReading { "balcony_pv_voltage", "Balcony PV Voltage", "/smarthome/balcony/sensor/pv_voltage", "V", "voltage", pvVoltage };
-        mqttService.publishJson(String(baseTopic) + "/sensor/pv_voltage", HomeAssistantPayloadBuilder::build(pvReading));
-    }
+    SensorReading pvReading { "balcony_pv_voltage", "Balcony PV Voltage", "/smarthome/balcony/sensor/pv_voltage", "V", "voltage", pvVoltage };
+    mqttService.publishJson(String(baseTopic) + "/sensor/pv_voltage", HomeAssistantPayloadBuilder::build(pvReading));
 
-    if (totalEnergy > 0.0f) {
-        SensorReading energyReading { "balcony_total_energy", "Balcony Total Energy", "/smarthome/balcony/sensor/total_energy", "kWh", "energy", totalEnergy };
-        mqttService.publishJson(String(baseTopic) + "/sensor/total_energy", HomeAssistantPayloadBuilder::build(energyReading));
-    }
+    SensorReading energyReading { "balcony_total_energy", "Balcony Total Energy", "/smarthome/balcony/sensor/total_energy", "kWh", "energy", totalEnergy };
+    mqttService.publishJson(String(baseTopic) + "/sensor/total_energy", HomeAssistantPayloadBuilder::build(energyReading));
 }

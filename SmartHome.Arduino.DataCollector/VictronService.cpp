@@ -47,10 +47,10 @@ void VictronService::update()
 
 float VictronService::pvVoltage() const
 {
-    return pvVoltageValue;
+    return pvVoltageValue / 1000.0f;
 }
 
 float VictronService::totalEnergy() const
 {
-    return totalEnergyValue;
+    return totalEnergyValue / 1000.0f;
 }
