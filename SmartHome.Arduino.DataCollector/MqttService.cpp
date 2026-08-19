@@ -37,13 +37,15 @@ bool MqttService::publishJson(const String& topic, const String& payload)
 void MqttService::reconnectIfNeeded()
 {
     if (!client.connected()) {
-        Serial.println("MQTT reconnect attempt.");
+        Serial.print("MQTT reconnect attempt. state = ");
+        Serial.println(client.state());
 
         if (!client.connect("SmartHomeCollector")) {
             Serial.print("MQTT reconnect failed, state = ");
             Serial.println(client.state());
             connected = false;
-        } else {
+        }
+        else {
             connected = true;
             Serial.println("MQTT reconnected.");
         }
@@ -52,5 +54,13 @@ void MqttService::reconnectIfNeeded()
 
 void MqttService::loop()
 {
+    bool wasConnected = client.connected();
+
     client.loop();
+
+    bool isConnected = client.connected();
+
+    if (wasConnected && !isConnected) {
+        Serial.println("!!! MQTT CONNECTION LOST !!!");
+    };
 }
