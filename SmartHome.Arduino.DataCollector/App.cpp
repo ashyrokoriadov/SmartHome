@@ -192,13 +192,13 @@ void App::publishSensorData()
     char timestamp[32];
     clockService.formatUtc(timestamp, sizeof(timestamp));
 
-    SensorReading temperatureReading{ "balcony_temperature", "Balcony Temperature", String(baseTopic) + "/sensor/temperature", "°C", "temperature", data.temperature };
-    SensorReading humidityReading{ "balcony_humidity", "Balcony Humidity", String(baseTopic) + "/sensor/humidity", "%", "humidity", data.humidity };
-    SensorReading pressureReading{ "balcony_pressure", "Balcony Pressure", String(baseTopic) + "/sensor/pressure", "hPa", "pressure", data.pressure };
-    SensorReading lightReading{ "balcony_light", "Balcony Light", String(baseTopic) + "/sensor/light", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
-    SensorReading airQualityReading{ "balcony_aqi", "Balcony AQI", String(baseTopic) + "/sensor/aqi", "AQI", "aqi", data.airQualityIndex };
-    SensorReading eco2Reading{ "balcony_eco2", "Balcony eCO2", String(baseTopic) + "/sensor/eco2", "ppm", "carbon_dioxide", data.eco2 };
-    SensorReading tvocReading{ "balcony_tvoc", "Balcony TVOC", String(baseTopic) + "/sensor/tvoc", "ppb", "volatile_organic_compounds", data.tvoc };
+    SensorReading temperatureReading{ "balcony_temperature", "Balcony Temperature", "/smarthome/balcony/sensor/temperature", "°C", "temperature", data.temperature };
+    SensorReading humidityReading{ "balcony_humidity", "Balcony Humidity", "/smarthome/balcony/sensor/humidity", "%", "humidity", data.humidity };
+    SensorReading pressureReading{ "balcony_pressure", "Balcony Pressure", "/smarthome/balcony/sensor/pressure", "hPa", "pressure", data.pressure };
+    SensorReading lightReading{ "balcony_light", "Balcony Light", "/smarthome/balcony/sensor/light", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
+    SensorReading airQualityReading{ "balcony_aqi", "Balcony AQI", "/smarthome/balcony/sensor/aqi", "AQI", "aqi", data.airQualityIndex };
+    SensorReading eco2Reading{ "balcony_eco2", "Balcony eCO2", "/smarthome/balcony/sensor/eco2", "ppm", "carbon_dioxide", data.eco2 };
+    SensorReading tvocReading{ "balcony_tvoc", "Balcony TVOC", "/smarthome/balcony/sensor/tvoc", "ppb", "volatile_organic_compounds", data.tvoc };
 
     mqttService.publishJson(String(baseTopic) + "/sensor/temperature", HomeAssistantPayloadBuilder::build(temperatureReading));
     mqttService.publishJson(String(baseTopic) + "/sensor/humidity", HomeAssistantPayloadBuilder::build(humidityReading));
