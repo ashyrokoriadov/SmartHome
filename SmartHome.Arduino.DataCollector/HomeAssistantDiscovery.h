@@ -18,13 +18,13 @@ public:
 		if (deviceClass && deviceClass[0] != '\0') {
 			doc["device_class"] = deviceClass;
 		}
+		doc["value_template"] = "{{ value_json.state }}";
 
 		JsonObject device = doc.createNestedObject("device");
 		device["identifiers"] = String("smarthome_collector_") + DEVICE_LOCATION;
 		device["name"] = String("SmartHome Collector ") + DEVICE_LOCATION;
 		device["model"] = "SmartHome Collector";
-		device["manufacturer"] = "DIY";
-		device["value_template"] = "{{ value_json.state }}";
+		device["manufacturer"] = "DIY";		
 
 		String json;
 		serializeJson(doc, json);
