@@ -218,12 +218,12 @@ void App::publishVictronData()
     const char* baseTopic = MQTT_BASE_TOPIC;
 
     if (pvVoltage > 0.0f) {
-        SensorReading pvReading { "balcony_pv_voltage", "Balcony PV Voltage", "/smarthome/balcony/pv_voltage", "V", "voltage", pvVoltage };
+        SensorReading pvReading { "balcony_pv_voltage", "Balcony PV Voltage", "/smarthome/balcony/sensor/pv_voltage", "V", "voltage", pvVoltage };
         mqttService.publishJson(String(baseTopic) + "/sensor/pv_voltage", HomeAssistantPayloadBuilder::build(pvReading));
     }
 
     if (totalEnergy > 0.0f) {
-        SensorReading energyReading { "balcony_total_energy", "Balcony Total Energy", "/smarthome/balcony/total_energy", "kWh", "energy", totalEnergy };
+        SensorReading energyReading { "balcony_total_energy", "Balcony Total Energy", "/smarthome/balcony/sensor/total_energy", "kWh", "energy", totalEnergy };
         mqttService.publishJson(String(baseTopic) + "/sensor/total_energy", HomeAssistantPayloadBuilder::build(energyReading));
     }
 }
