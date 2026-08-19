@@ -55,6 +55,15 @@ void App::publishDiscovery()
         mqttService.publishJson(configTopic, payload);
     }
 
+    // Temperature External
+    {
+        const char* uniqueId = "balcony_temperature_external";
+        String stateTopic = String(baseTopic) + "/sensor/temperature-external";
+        String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
+        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony External Temperature", stateTopic.c_str(), "°C", "temperature");
+        mqttService.publishJson(configTopic, payload);
+    }
+
     // Humidity
     {
         const char* uniqueId = "balcony_humidity";
@@ -73,12 +82,21 @@ void App::publishDiscovery()
         mqttService.publishJson(configTopic, payload);
     }
 
-    // Light
+    // Light Analogue
     {
         const char* uniqueId = "balcony_light_analogue";
         String stateTopic = String(baseTopic) + "/sensor/light-analogue";
         String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
-        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Light", stateTopic.c_str(), "lx", "illuminance");
+        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Light Analogue", stateTopic.c_str(), "lx", "illuminance");
+        mqttService.publishJson(configTopic, payload);
+    }
+
+	// Light Digital
+    {
+        const char* uniqueId = "balcony_light_digital";
+        String stateTopic = String(baseTopic) + "/sensor/light-digital";
+        String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
+        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Light Digital", stateTopic.c_str(), "lx", "illuminance");
         mqttService.publishJson(configTopic, payload);
     }
 
