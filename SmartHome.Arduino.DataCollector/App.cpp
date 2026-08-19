@@ -123,7 +123,7 @@ void App::publishDiscovery()
 		const char* uniqueId = "balcony_total_energy";
 		String stateTopic = String(baseTopic) + "/sensor/total_energy";
 		String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
-		String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Total Energy", stateTopic.c_str(), "kWh", "energy");
+		String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony Total Energy", stateTopic.c_str(), "kWh", "energy", "total_increasing");
 		mqttService.publishJson(configTopic, payload);
 	}
 }

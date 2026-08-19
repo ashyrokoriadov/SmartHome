@@ -6,7 +6,7 @@
 
 class HomeAssistantDiscovery {
 public:
-	static String buildSensorConfig(const char* uniqueId, const char* name, const char* stateTopic, const char* unit, const char* deviceClass)
+	static String buildSensorConfig(const char* uniqueId, const char* name, const char* stateTopic, const char* unit, const char* deviceClass, const char* stateClass = nullptr)
 	{
 		StaticJsonDocument<512> doc;
 		doc["name"] = name;
@@ -17,6 +17,9 @@ public:
 		}
 		if (deviceClass && deviceClass[0] != '\0') {
 			doc["device_class"] = deviceClass;
+		}
+		if (stateClass && stateClass[0] != '\0') {
+			doc["state_class"] = stateClass;
 		}
 		doc["value_template"] = "{{ value_json.state }}";
 
