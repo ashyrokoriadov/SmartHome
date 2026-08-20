@@ -214,8 +214,8 @@ void App::publishSensorData()
     SensorReading temperatureExternalReading{ "balcony_temperature_external", "Balcony External Temperature", "/smarthome/balcony/sensor/temperature-external", "°C", "temperature", data.temperatureExternal };
     SensorReading humidityReading{ "balcony_humidity", "Balcony Humidity", "/smarthome/balcony/sensor/humidity", "%", "humidity", data.humidity };
     SensorReading pressureReading{ "balcony_pressure", "Balcony Pressure", "/smarthome/balcony/sensor/pressure", "hPa", "pressure", data.pressure };
-    SensorReading lightReadingAnalogue{ "balcony_light_analogue", "Balcony Light", "/smarthome/balcony/sensor/light-analogue", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
-    SensorReading lightReadingDigital { "balcony_light_digital", "Balcony Light", "/smarthome/balcony/sensor/light-digital", "lx", "illuminance", static_cast<float>(data.lightDigital) };
+    SensorReading lightReadingAnalogue{ "balcony_light_analogue", "Balcony Light Analogue", "/smarthome/balcony/sensor/light-analogue", "lx", "illuminance", static_cast<float>(data.lightAnalog) };
+    SensorReading lightReadingDigital { "balcony_light_digital", "Balcony Light Digital", "/smarthome/balcony/sensor/light-digital", "lx", "illuminance", static_cast<float>(data.lightDigital) };
     SensorReading airQualityReading{ "balcony_aqi", "Balcony AQI", "/smarthome/balcony/sensor/aqi", "AQI", "aqi", data.airQualityIndex };
     SensorReading eco2Reading{ "balcony_eco2", "Balcony eCO2", "/smarthome/balcony/sensor/eco2", "ppm", "carbon_dioxide", data.eco2 };
     SensorReading tvocReading{ "balcony_tvoc", "Balcony TVOC", "/smarthome/balcony/sensor/tvoc", "ppb", "volatile_organic_compounds", data.tvoc };

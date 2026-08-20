@@ -88,5 +88,23 @@ SensorData SensorService::readAll()
     data.lightAnalog = readLightAnalog();
     data.lightDigital = readLightDigital();
 
+    // Log all sensor values as key=value pairs for diagnostics
+    {
+        String log = "{";
+        log += "temperature=" + String(data.temperature) + ", ";
+        log += "temperatureExternal=" + String(data.temperatureExternal) + ", ";
+        log += "pressure=" + String(data.pressure) + ", ";
+        log += "altitude=" + String(data.altitude) + ", ";
+        log += "humidity=" + String(data.humidity) + ", ";
+        log += "airStatus=" + String(data.airStatus) + ", ";
+        log += "airQualityIndex=" + String(data.airQualityIndex) + ", ";
+        log += "tvoc=" + String(data.tvoc) + ", ";
+        log += "eco2=" + String(data.eco2) + ", ";
+        log += "lightAnalog=" + String(data.lightAnalog) + ", ";
+        log += "lightDigital=" + String(data.lightDigital);
+        log += "}";
+        Serial.println(log);
+    }
+
     return data;
 }

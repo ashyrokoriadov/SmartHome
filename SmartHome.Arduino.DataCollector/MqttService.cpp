@@ -8,7 +8,7 @@ bool MqttService::begin(const char* brokerHost, uint16_t port)
     client.setBufferSize(4096);
     client.setServer(brokerHost, port);
 
-    if (!client.connect("SmartHomeCollector")) {
+    if (!client.connect("SmartHomeCollector C")) {
         Serial.print("MQTT connection failed, state = ");
         Serial.println(client.state());
         return false;
@@ -40,7 +40,7 @@ void MqttService::reconnectIfNeeded()
         Serial.print("MQTT reconnect attempt. state = ");
         Serial.println(client.state());
 
-        if (!client.connect("SmartHomeCollector")) {
+        if (!client.connect("SmartHomeCollector R")) {
             Serial.print("MQTT reconnect failed, state = ");
             Serial.println(client.state());
             connected = false;
