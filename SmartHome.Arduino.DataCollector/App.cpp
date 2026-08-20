@@ -105,7 +105,7 @@ void App::publishDiscovery()
         const char* uniqueId = "balcony_aqi";
         String stateTopic = String(baseTopic) + "/sensor/aqi";
         String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
-        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony AQI", stateTopic.c_str(), "AQI", "aqi");
+        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony AQI", stateTopic.c_str(), nullptr, "aqi");
         mqttService.publishJson(configTopic, payload);
     }
 
@@ -123,7 +123,7 @@ void App::publishDiscovery()
         const char* uniqueId = "balcony_tvoc";
         String stateTopic = String(baseTopic) + "/sensor/tvoc";
         String configTopic = String("homeassistant/sensor/") + deviceId + "/" + uniqueId + "/config";
-        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony TVOC", stateTopic.c_str(), "ppb", "volatile_organic_compounds");
+        String payload = HomeAssistantDiscovery::buildSensorConfig(uniqueId, "Balcony TVOC", stateTopic.c_str(), "ppb", "volatile_organic_compounds_parts");
         mqttService.publishJson(configTopic, payload);
     }
 
@@ -148,12 +148,15 @@ void App::publishDiscovery()
 
 void App::loop()
 {
+    static unsigned long previousLoopMs = millis();
+
+    unsigned long loopStartMs = millis();
+
     if (WiFi.status() != WL_CONNECTED) {
         connectToWifi();
     }
 
     mqttService.loop();
-    mqttService.reconnectIfNeeded();
     lightingService.update();
 
     const unsigned long nowMs = millis();
@@ -166,6 +169,14 @@ void App::loop()
         lastVictronScanMs = nowMs;
         victronService.update();
         publishVictronData();
+    }
+
+    unsigned long loopDurationMs = millis() - loopStartMs;
+
+    if (loopDurationMs > 1000) {
+        Serial.print("WARNING: App::loop() took ");
+        Serial.print(loopDurationMs);
+        Serial.println(" ms");
     }
 }
 

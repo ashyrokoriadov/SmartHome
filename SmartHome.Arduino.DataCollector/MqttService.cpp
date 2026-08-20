@@ -54,13 +54,18 @@ void MqttService::reconnectIfNeeded()
 
 void MqttService::loop()
 {
-    bool wasConnected = client.connected();
+    static unsigned long lastLoopMs = millis();
+
+    unsigned long now = millis();
+    unsigned long gap = now - lastLoopMs;
+    lastLoopMs = now;
+
+    if (gap > 1000) {
+        Serial.print("WARNING: MQTT loop gap = ");
+        Serial.print(gap);
+        Serial.println(" ms");
+    }
 
     client.loop();
-
-    bool isConnected = client.connected();
-
-    if (wasConnected && !isConnected) {
-        Serial.println("!!! MQTT CONNECTION LOST !!!");
-    };
+    reconnectIfNeeded();    
 }
