@@ -8,7 +8,9 @@ bool MqttService::begin(const char* brokerHost, uint16_t port)
     client.setBufferSize(4096);
     client.setServer(brokerHost, port);
 
-    if (!client.connect("SmartHomeCollector C")) {
+    Serial.println("MQTT C: connecting...");
+
+    if (!client.connect(MQTT_CLIENT_ID)) {
         Serial.print("MQTT connection failed, state = ");
         Serial.println(client.state());
         return false;
@@ -21,14 +23,30 @@ bool MqttService::begin(const char* brokerHost, uint16_t port)
 
 bool MqttService::publishJson(const String& topic, const String& payload)
 {
-    if (!client.connected()) {
+    const bool isConnected = client.connected();
+
+    if (!isConnected) {
+        Serial.print("MQTT publish SKIPPED: not connected, topic=");
+        Serial.println(topic);
         return false;
     }
 
-    bool published = client.publish(topic.c_str(), payload.c_str(), true);
+    const bool published = client.publish(
+        topic.c_str(),
+        payload.c_str(),
+        true
+    );
+
+    Serial.print("MQTT publish: topic=");
+    Serial.print(topic);
+    Serial.print(" connected=");
+    Serial.print(isConnected);
+    Serial.print(" result=");
+    Serial.println(published ? "OK" : "FAILED");
+
     if (!published) {
-        Serial.print("MQTT publish failed for topic: ");
-        Serial.println(topic);
+        Serial.print("MQTT publish failed, client state=");
+        Serial.println(client.state());
     }
 
     return published;
@@ -40,7 +58,9 @@ void MqttService::reconnectIfNeeded()
         Serial.print("MQTT reconnect attempt. state = ");
         Serial.println(client.state());
 
-        if (!client.connect("SmartHomeCollector R")) {
+        Serial.println("MQTT R: reconnecting...");
+        
+        if (!client.connect(MQTT_CLIENT_ID)) {
             Serial.print("MQTT reconnect failed, state = ");
             Serial.println(client.state());
             connected = false;

@@ -8,6 +8,7 @@ constexpr char MQTT_BROKER[] = "192.168.1.94";
 constexpr uint16_t MQTT_PORT = 1883;
 constexpr char MQTT_BASE_TOPIC[] = "smarthome";
 constexpr char DEVICE_LOCATION[] = "Balcony";
+constexpr char MQTT_CLIENT_ID[] = "SmartHomeCollector";
 
 constexpr uint8_t ONE_WIRE_PIN = 4;
 constexpr uint8_t LIGHT_ANALOG_PIN = A0;
