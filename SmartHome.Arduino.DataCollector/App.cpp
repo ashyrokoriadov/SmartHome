@@ -18,6 +18,8 @@ void App::setup()
 {
     Serial.begin(115200);
     delay(1000);
+    Wire.begin();
+    Wire.setClock(100000);
 
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
     digitalWrite(LAMPS_CONTROL_PIN, LOW);
