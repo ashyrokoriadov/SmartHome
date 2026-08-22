@@ -13,6 +13,8 @@ public:
     float pvVoltage() const;
     float totalEnergy() const;
 
+    VictronSerialReader victronSerialReader;
+
 private:
     ClockService& clockService;
     HardwareSerial& serial;

@@ -10,6 +10,8 @@ VictronService::VictronService(ClockService& clock)
 {
 }
 
+VictronSerialReader victronSerialReader;
+
 bool VictronService::begin()
 {
     pinMode(VICTRON_RX_PIN, INPUT);
@@ -19,38 +21,47 @@ bool VictronService::begin()
 
 void VictronService::update()
 {
-    while (serial.available()) {
-        const char incoming = static_cast<char>(serial.read());
-        String current = String(incoming);
-        if (current == "\n" || current == "\r") {
-            continue;
-        }
+    int counter = 0;
 
-        String line = current;
-        while (serial.available()) {
-            char next = static_cast<char>(serial.read());
-            if (next == '\n' || next == '\r') {
-                break;
+    while (Serial1.available())
+    {
+        byte b = Serial1.read();
+        String token = (b == 'D') ? "D" : String(b, HEX);
+        ParsedValue parsedValue = victronSerialReader.ReadByte(token);
+
+        if (!parsedValue.IsEmpty()
+            && parsedValue.Name != "Unknown"
+            && parsedValue.Name != "ChargerState"
+            && parsedValue.Name != "Error"
+            && parsedValue.Name != "ProductId"
+            && parsedValue.Name != "SerialNumber"            
+            && parsedValue.Name != "Current"
+            && parsedValue.Name != "PanelPower"
+            && parsedValue.Name != "Voltage")
+        {
+            counter++;
+            
+            if (parsedValue.Name == "PanelVoltage") {
+                pvVoltageValue = parsedValue.Value.toFloat();
             }
-            line += next;
+            else if (parsedValue.Name == "H19") {
+                totalEnergyValue = parsedValue.Value.toFloat();
+            }
         }
 
-        VictronMeasurement measurement = VictronParser::parse(line);
-        if (measurement.name == "pv_voltage") {
-            pvVoltageValue = measurement.value;
+        if (counter == 5)
+        {
+            break;
         }
-        else if (measurement.name == "total_energy") {
-            totalEnergyValue = measurement.value;
-        }
-    }
+    }    
 }
 
 float VictronService::pvVoltage() const
 {
-    return pvVoltageValue / 1000.0f;
+    return pvVoltageValue;
 }
 
 float VictronService::totalEnergy() const
 {
-    return totalEnergyValue / 1000.0f;
+    return totalEnergyValue;
 }
