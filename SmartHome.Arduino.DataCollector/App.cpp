@@ -30,6 +30,11 @@ void App::setup()
 
 	if (!sensorServiceOk) {
 		Serial.println("Sensor service failed to initialize.");
+        Serial.print("SDA=");
+        Serial.println(digitalRead(SDA));
+
+        Serial.print("SCL=");
+        Serial.println(digitalRead(SCL));
 	}
 
     if (wifiOk) {
