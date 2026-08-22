@@ -25,8 +25,12 @@ void App::setup()
     bool wifiOk = connectToWifi();
 
     clockService.begin();
-    sensorService.begin();
+    bool sensorServiceOk = sensorService.begin();
     victronService.begin();
+
+	if (!sensorServiceOk) {
+		Serial.println("Sensor service failed to initialize.");
+	}
 
     if (wifiOk) {
         if (!mqttService.begin(MQTT_BROKER, MQTT_PORT)) {

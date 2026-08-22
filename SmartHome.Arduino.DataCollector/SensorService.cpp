@@ -9,28 +9,49 @@ bool SensorService::begin()
     pinMode(LIGHT_DIGITAL_PIN, INPUT);
 
     int retries = 0;
-    while (ens160.begin() != NO_ERR) {
-        Serial.println("ENS160 init failed.");
-        if (retries++ >= 4) {
+    bool ens160Ok = false;
+
+    while (retries++ < 5)
+    {
+        if (ens160.begin() == NO_ERR)
+        {
+            ens160Ok = true;
             break;
         }
+
+        Serial.println("ENS160 init failed.");
         delay(1000);
     }
 
-    ens160.setPWRMode(ENS160_STANDARD_MODE);
+    if (ens160Ok)
+        ens160.setPWRMode(ENS160_STANDARD_MODE);
 
     retries = 0;
+    bool bmeOk = false;
+
     bme.reset();
-    while (bme.begin() != BME::eStatusOK) {
-        Serial.println("BME280 init failed.");
-        if (retries++ >= 4) {
+
+    while (retries++ < 5)
+    {
+        if (bme.begin() == BME::eStatusOK)
+        {
+            bmeOk = true;
             break;
         }
+
+        Serial.println("BME280 init failed.");
         delay(2000);
     }
 
-    ens160.setTempAndHum(bme.getTemperature(), bme.getHumidity());
-    return true;
+    if (ens160Ok && bmeOk)
+    {
+        ens160.setTempAndHum(
+            bme.getTemperature(),
+            bme.getHumidity()
+        );
+    }
+
+    return ens160Ok && bmeOk;
 }
 
 float SensorService::readTemperature()
