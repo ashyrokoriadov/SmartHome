@@ -18,8 +18,6 @@ void App::setup()
 {
     Serial.begin(115200);
     delay(1000);
-    Wire.begin();
-    Wire.setClock(100000);
 
     pinMode(LAMPS_CONTROL_PIN, OUTPUT);
     digitalWrite(LAMPS_CONTROL_PIN, LOW);
@@ -165,6 +163,14 @@ void App::loop()
 
     if (WiFi.status() != WL_CONNECTED) {
         connectToWifi();
+    }
+
+    if (digitalRead(SDA) == LOW || digitalRead(SCL) == LOW)
+    {
+        Serial.print("!!! I2C BUS: SDA=");
+        Serial.print(digitalRead(SDA));
+        Serial.print(" SCL=");
+        Serial.println(digitalRead(SCL));
     }
 
     mqttService.loop();
