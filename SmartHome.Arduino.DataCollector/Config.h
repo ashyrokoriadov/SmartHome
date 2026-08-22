@@ -17,8 +17,8 @@ constexpr uint8_t LAMPS_CONTROL_PIN = 7;
 constexpr uint8_t VICTRON_RX_PIN = 0;
 constexpr uint8_t VICTRON_TX_PIN = 1;
 
-constexpr unsigned long SENSOR_INTERVAL_MS = 10UL * 1000UL;
-constexpr unsigned long VICRON_INTERVAL_MS = 10UL * 1000UL;
+constexpr unsigned long SENSOR_INTERVAL_MS = 30UL * 1000UL;
+constexpr unsigned long VICRON_INTERVAL_MS = 30UL * 1000UL;
 constexpr unsigned long WIFI_RETRY_MS = 5UL * 1000UL;
 constexpr unsigned long MQTT_RETRY_MS = 10UL * 1000UL;
 
