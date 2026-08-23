@@ -199,6 +199,40 @@ bool SensorService::recoverI2CBus()
     Wire.begin();
     delay(5);
 
+    Serial.println("I2C scan after recovery:");
+
+    int devicesFound = 0;
+
+    for (uint8_t address = 1; address < 127; ++address)
+    {
+        Wire.beginTransmission(address);
+        uint8_t error = Wire.endTransmission();
+
+        if (error == 0)
+        {
+            Serial.print("  0x");
+
+            if (address < 16)
+                Serial.print("0");
+
+            Serial.print(address, HEX);
+            Serial.println(" ACK");
+
+            devicesFound++;
+        }
+    }
+
+    if (devicesFound == 0)
+    {
+        Serial.println("  No I2C devices found!");
+    }
+    else
+    {
+        Serial.print("I2C scan: ");
+        Serial.print(devicesFound);
+        Serial.println(" device(s) found");
+    }
+
     this->begin();
 
     Serial.println("I2C Wire restarted");
