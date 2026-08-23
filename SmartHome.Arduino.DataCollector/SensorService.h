@@ -49,6 +49,7 @@ public:
     int readLightDigital();
     AirQualityData readAirQuality();
     AirPollutionData readAirPollution();
+    bool recoverI2CBus();
 
 private:
     OneWire oneWire{ONE_WIRE_PIN};

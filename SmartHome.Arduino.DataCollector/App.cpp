@@ -171,6 +171,8 @@ void App::loop()
         Serial.print(digitalRead(SDA));
         Serial.print(" SCL=");
         Serial.println(digitalRead(SCL));
+
+        sensorService.recoverI2CBus();
     }
 
     mqttService.loop();

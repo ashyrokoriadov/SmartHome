@@ -129,3 +129,79 @@ SensorData SensorService::readAll()
 
     return data;
 }
+
+bool SensorService::recoverI2CBus()
+{
+    Serial.println("I2C recovery started");
+
+    pinMode(SDA, INPUT);
+    pinMode(SCL, INPUT);
+
+    delay(5);
+
+    bool sda = digitalRead(SDA);
+    bool scl = digitalRead(SCL);
+
+    Serial.print("I2C before recovery: SDA=");
+    Serial.print(sda);
+    Serial.print(" SCL=");
+    Serial.println(scl);
+
+    // SCL LOW -> There is no a good way to recover SCL LOW oznacza.
+    if (scl == LOW)
+    {
+        Serial.println("I2C recovery failed: SCL is LOW");
+        return false;
+    }
+
+    // SDA LOW -> try to push a slave out of never ending trasfer.
+    if (sda == LOW)
+    {
+        Serial.println("I2C recovery: SDA is LOW");
+
+        pinMode(SCL, OUTPUT);
+
+        for (int i = 0; i < 9; ++i)
+        {
+            digitalWrite(SCL, LOW);
+            delayMicroseconds(10);
+
+            digitalWrite(SCL, HIGH);
+            delayMicroseconds(10);
+
+            if (digitalRead(SDA) == HIGH)
+            {
+                Serial.print("I2C recovery: SDA released after ");
+                Serial.print(i + 1);
+                Serial.println(" clocks");
+                break;
+            }
+        }
+
+        pinMode(SCL, INPUT);
+    }
+
+    if (digitalRead(SDA) == LOW || digitalRead(SCL) == LOW)
+    {
+        Serial.print("I2C recovery failed: SDA=");
+        Serial.print(digitalRead(SDA));
+        Serial.print(" SCL=");
+        Serial.println(digitalRead(SCL));
+
+        return false;
+    }
+
+    Serial.println("I2C bus released");
+
+    Wire.end();
+    delay(5);
+
+    Wire.begin();
+    delay(5);
+
+    this->begin();
+
+    Serial.println("I2C Wire restarted");
+
+    return true;
+}
