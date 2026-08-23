@@ -37,13 +37,6 @@ bool MqttService::publishJson(const String& topic, const String& payload)
         true
     );
 
-    Serial.print("MQTT publish: topic=");
-    Serial.print(topic);
-    Serial.print(" connected=");
-    Serial.print(isConnected);
-    Serial.print(" result=");
-    Serial.println(published ? "OK" : "FAILED");
-
     if (!published) {
         Serial.print("MQTT publish failed, client state=");
         Serial.println(client.state());
