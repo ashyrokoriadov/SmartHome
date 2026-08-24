@@ -3,10 +3,11 @@
 #include <Arduino.h>
 #include <RTClib.h>
 
-class ClockService {
+class ClockService
+{
 public:
     bool begin();
-    DateTime now();
+    bool now(DateTime& result);
     void formatUtc(char* output, size_t outputSize);
 
 private:

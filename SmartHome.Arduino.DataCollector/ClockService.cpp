@@ -11,14 +11,27 @@ bool ClockService::begin()
     return true;
 }
 
-DateTime ClockService::now()
+bool ClockService::now(DateTime& result)
 {
-    return rtc.now();
+    result = rtc.now();
+
+    if (result.year() < 2020 || result.year() > 2100) {
+        Serial.println("RTC returned invalid time.");
+        return false;
+    }
+
+    return true;
 }
 
 void ClockService::formatUtc(char* output, size_t outputSize)
 {
-    DateTime nowValue = rtc.now();
+    DateTime nowValue;
+
+    if (!now(nowValue)) {
+        output[0] = '\0';
+        return;
+    }
+
     snprintf(
         output,
         outputSize,
