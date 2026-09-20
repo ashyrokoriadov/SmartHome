@@ -4,7 +4,7 @@
 
 constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";
 constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
-constexpr char MQTT_BROKER[] = "192.168.1.94";
+constexpr char MQTT_BROKER[] = "192.168.1.96";
 constexpr uint16_t MQTT_PORT = 1883;
 constexpr char MQTT_BASE_TOPIC[] = "smarthome";
 constexpr char DEVICE_LOCATION[] = "Balcony";
