@@ -50,7 +50,7 @@ void LightingService::update()
 
     int hour = nowValue.hour();
 
-    bool newTimeCondition = (hour >= 16 && hour <= 19);
+    bool newTimeCondition = (hour >= 16 && hour <= 21);
     bool newLightCondition = (sensorService.readLightDigital() == 1);
 
     changed = (timeCondition != newTimeCondition) ||
