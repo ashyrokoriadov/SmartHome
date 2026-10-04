@@ -4,11 +4,13 @@
 
 constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";
 constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
+constexpr bool MQTT_ENABLED = false; // Set to true to enable MQTT functionality. Set to false to disable MQTT functionality.
 constexpr char MQTT_BROKER[] = "192.168.1.96";
 constexpr uint16_t MQTT_PORT = 1883;
 constexpr char MQTT_BASE_TOPIC[] = "smarthome";
 constexpr char DEVICE_LOCATION[] = "Balcony";
 constexpr char MQTT_CLIENT_ID[] = "SmartHomeCollector";
+constexpr bool LIGHTING_USE_TIME_ONLY = true; // If true, lighting will be controlled based on time only, ignoring light sensor readings.
 
 constexpr uint8_t ONE_WIRE_PIN = 4;
 constexpr uint8_t LIGHT_ANALOG_PIN = A0;

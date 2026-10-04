@@ -4,6 +4,11 @@
 bool MqttService::begin(const char* brokerHost, uint16_t port)
 {
     connected = false;
+    if (!MQTT_ENABLED) {
+        Serial.println("MQTT is disabled in Config.h.");
+        return false;
+    }
+
     client.setClient(wifiClient);
     client.setBufferSize(4096);
     client.setServer(brokerHost, port);
@@ -23,6 +28,10 @@ bool MqttService::begin(const char* brokerHost, uint16_t port)
 
 bool MqttService::publishJson(const String& topic, const String& payload)
 {
+    if (!MQTT_ENABLED) {
+        return false;
+    }
+
     const bool isConnected = client.connected();
 
     if (!isConnected) {
@@ -47,6 +56,10 @@ bool MqttService::publishJson(const String& topic, const String& payload)
 
 void MqttService::reconnectIfNeeded()
 {
+    if (!MQTT_ENABLED) {
+        return;
+    }
+
     if (!client.connected()) {
         Serial.print("MQTT reconnect attempt. state = ");
         Serial.println(client.state());
@@ -67,6 +80,10 @@ void MqttService::reconnectIfNeeded()
 
 void MqttService::loop()
 {
+    if (!MQTT_ENABLED) {
+        return;
+    }
+
     static unsigned long lastLoopMs = millis();
 
     unsigned long now = millis();

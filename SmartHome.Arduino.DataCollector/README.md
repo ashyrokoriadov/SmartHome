@@ -40,9 +40,11 @@ Edit `Config.h` and set:
 
 - `WIFI_SSID`
 - `WIFI_PASSWORD`
+- `MQTT_ENABLED` (`false` disables all MQTT connections and publishing)
 - `MQTT_BROKER`
 - `MQTT_PORT`
 - `DEVICE_LOCATION`
+- `LIGHTING_USE_TIME_ONLY` (`true` uses the schedule-only lighting service; `false` keeps the light-sensor-based service)
 
 ## Notes
 

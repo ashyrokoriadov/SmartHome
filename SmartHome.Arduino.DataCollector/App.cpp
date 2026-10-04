@@ -7,6 +7,7 @@ App::App()
     : clockService(),
       sensorService(),
       lightingService(clockService, sensorService),
+      timeScheduleLightingService(clockService),
       victronService(clockService),
       mqttService(),
       lastSensorScanMs(0),
@@ -37,14 +38,18 @@ void App::setup()
         Serial.println(digitalRead(SCL));
 	}
 
-    if (wifiOk) {
+    if (!MQTT_ENABLED) {
+        Serial.println("Skipping MQTT because it is disabled in Config.h.");
+    } else if (wifiOk) {
         if (!mqttService.begin(MQTT_BROKER, MQTT_PORT)) {
             Serial.println("Initial MQTT connect failed.");
         }
     } else {
         Serial.println("Skipping MQTT begin because WiFi is not connected.");
     }
-    publishDiscovery();
+    if (MQTT_ENABLED) {
+        publishDiscovery();
+    }
 
     lastSensorScanMs = millis();
     lastVictronScanMs = millis();
@@ -176,7 +181,11 @@ void App::loop()
     }
 
     mqttService.loop();
-    lightingService.update();
+    if (LIGHTING_USE_TIME_ONLY) {
+        timeScheduleLightingService.update();
+    } else {
+        lightingService.update();
+    }
 
     const unsigned long nowMs = millis();
     if (nowMs - lastSensorScanMs >= SENSOR_INTERVAL_MS) {
