@@ -4,6 +4,7 @@
 #include "ClockService.h"
 #include "SensorService.h"
 #include "LightingService.h"
+#include "LightSensorLightingService.h"
 #include "TimeScheduleLightingService.h"
 #include "VictronService.h"
 #include "MqttService.h"
@@ -19,6 +20,7 @@ private:
     ClockService clockService;
     SensorService sensorService;
     LightingService lightingService;
+    LightSensorLightingService lightSensorLightingService;
     TimeScheduleLightingService timeScheduleLightingService;
     VictronService victronService;
     MqttService mqttService;

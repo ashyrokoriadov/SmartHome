@@ -10,12 +10,14 @@ constexpr uint16_t MQTT_PORT = 1883;
 constexpr char MQTT_BASE_TOPIC[] = "smarthome";
 constexpr char DEVICE_LOCATION[] = "Balcony";
 constexpr char MQTT_CLIENT_ID[] = "SmartHomeCollector";
-constexpr bool LIGHTING_USE_TIME_ONLY = true; // If true, lighting will be controlled based on time only, ignoring light sensor readings.
+constexpr bool LIGHTING_USE_TIME_ONLY = false; // If true, lighting will be controlled based on time only, ignoring light sensor readings.
+constexpr bool LIGHTING_USE_DIGITAL_SENSOR = true; // If true, lighting will be controlled by the digital light sensor.
 
 constexpr uint8_t ONE_WIRE_PIN = 4;
 constexpr uint8_t LIGHT_ANALOG_PIN = A0;
 constexpr uint8_t LIGHT_DIGITAL_PIN = 2;
 constexpr uint8_t LAMPS_CONTROL_PIN = 7;
+constexpr bool LIGHT_SENSOR_ON_DIGITAL_VALUE = HIGH; // Turn lamps ON when the digital sensor reads this value.
 constexpr uint8_t VICTRON_RX_PIN = 0;
 constexpr uint8_t VICTRON_TX_PIN = 1;
 

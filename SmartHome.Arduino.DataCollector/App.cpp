@@ -7,6 +7,7 @@ App::App()
     : clockService(),
       sensorService(),
       lightingService(clockService, sensorService),
+      lightSensorLightingService(sensorService),
       timeScheduleLightingService(clockService),
       victronService(clockService),
       mqttService(),
@@ -181,7 +182,9 @@ void App::loop()
     }
 
     mqttService.loop();
-    if (LIGHTING_USE_TIME_ONLY) {
+    if (LIGHTING_USE_DIGITAL_SENSOR) {
+        lightSensorLightingService.update();
+    } else if (LIGHTING_USE_TIME_ONLY) {
         timeScheduleLightingService.update();
     } else {
         lightingService.update();
